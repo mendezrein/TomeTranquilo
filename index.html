@@ -1,0 +1,1321 @@
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { 
+  Plus, 
+  Minus,
+  Trash2, 
+  DollarSign, 
+  FileText, 
+  X, 
+  ChevronRight, 
+  ChevronDown, 
+  ChevronUp,
+  Calculator,
+  HelpCircle,
+  AlertCircle,
+  Info,
+  MessageSquare,
+  Clipboard,
+  Loader2,
+  Undo,
+  Redo,
+  Copy,
+  Download,
+  Upload,
+  Save,
+  ArrowRight,
+  Users,
+  Calendar,
+  CheckCircle2,
+  Share2
+} from 'lucide-react';
+
+// --- Gemini API Configuration ---
+const apiKey = "";
+
+const fetchGemini = async (prompt, isJson = false, systemInstruction = "") => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    systemInstruction: { parts: [{ text: systemInstruction }] }
+  };
+
+  if (isJson) {
+    payload.generationConfig = {
+      responseMimeType: "application/json"
+    };
+  }
+
+  let delay = 1000;
+  for (let i = 0; i < 5; i++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('API Error');
+      const result = await response.json();
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      return isJson ? JSON.parse(text) : text;
+    } catch (error) {
+      if (i === 4) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2;
+    }
+  }
+};
+
+// --- Utility Functions ---
+
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('es-CL', { 
+    style: 'currency', 
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
+const copyToClipboard = (text) => {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
+};
+
+// --- Constants ---
+
+const TIPS = [
+  <span><strong>Tip Rápido:</strong> Si la División dice <strong>"No"</strong>, el precio es unitario (se multiplica por cantidad).</span>,
+  <span><strong>Tip Rápido:</strong> Si pones un número en División (ej. 4), el precio se divide equitativamente entre ellos.</span>,
+  <span><strong>Tip Rápido:</strong> Usa los botones <strong>- y +</strong> para ajustar cuántas unidades consumió cada persona.</span>,
+  <span><strong>Tip Rápido:</strong> Puedes <strong>guardar grupos</strong> de amigos frecuentes para no escribir los nombres siempre.</span>,
+  <span><strong>Tip Rápido:</strong> Si el total no cuadra con la boleta, usa el campo de <strong>Verificación</strong> para ver la diferencia.</span>,
+  <span><strong>Tip Rápido:</strong> Haz clic en el nombre de una persona en el resumen para ver el <strong>detalle</strong> de lo que comió.</span>,
+  <span><strong>Tip Rápido:</strong> La fila se pone <span className="bg-red-100 text-red-700 px-1 font-bold border border-red-300 rounded">ROJA</span> si la división no coincide con los seleccionados.</span>
+];
+
+const FEATURES = [
+  { icon: <Calculator size={24}/>, title: "División Flexible", desc: "Divide items por unidad (quién comió cuántos) o compártelos equitativamente entre varios (ej: una pizza entre 4)." },
+  { icon: <MessageSquare size={24}/>, title: "Cobro por WhatsApp", desc: "Genera un mensaje cordial con el resumen exacto por persona, listo para copiar y enviar al grupo." },
+  { icon: <Users size={24}/>, title: "Grupos Frecuentes", desc: "¿Sales siempre con los mismos? Guarda tus grupos de amigos, familia o trabajo y cárgalos en un clic." },
+  { icon: <Save size={24}/>, title: "Sin Registro", desc: "Todo se guarda localmente en tu navegador o en archivos de texto. Tu privacidad está asegurada." },
+  { icon: <CheckCircle2 size={24}/>, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
+  { icon: <FileText size={24}/>, title: "Respaldo Fácil", desc: "Guarda tu cuenta como un archivo y retómala cuando quieras sin perder ningún dato." }
+];
+
+// --- Initial Data ---
+
+const EMPTY_BILL = {
+  id: 'default',
+  name: '', // Empty name initially to force input
+  date: new Date().toISOString().split('T')[0],
+  people: ['Persona A', 'Persona B'],
+  items: [
+    { 
+      id: '1', 
+      name: 'Item Ejemplo', 
+      price: 10000, 
+      splitCount: 1, 
+      shares: { 'Persona A': 1, 'Persona B': 0 } 
+    }
+  ],
+  tipPercent: 10,
+  verificationTotal: '' 
+};
+
+export default function CuentasClaras() {
+  // --- State ---
+  const [bills, setBills] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cuentas_claras_data');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(bill => ({
+            ...bill,
+            verificationTotal: bill.verificationTotal !== undefined ? bill.verificationTotal : '',
+            items: bill.items.map(item => ({
+              ...item,
+              splitCount: item.splitCount || 1, 
+              shares: Object.keys(item.shares).reduce((acc, key) => {
+                const val = item.shares[key];
+                if (typeof val === 'boolean') {
+                    acc[key] = val ? 1 : 0;
+                } else {
+                    acc[key] = parseFloat(val) || 0;
+                }
+                return acc;
+              }, {})
+            }))
+          }));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load bills", e);
+    }
+    return [EMPTY_BILL];
+  });
+  
+  const [activeBillId, setActiveBillId] = useState(() => {
+    const savedId = localStorage.getItem('cuentas_claras_active_id');
+    return savedId || bills[0]?.id || 'default';
+  });
+
+  // Saved Groups State
+  const [savedGroups, setSavedGroups] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cuentas_claras_groups');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  // History State for Undo/Redo
+  const [history, setHistory] = useState([]);
+  const [future, setFuture] = useState([]);
+
+  // UI States
+  const [showHelp, setShowHelp] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [aiDraftMessage, setAiDraftMessage] = useState("");
+  const [expandedPeople, setExpandedPeople] = useState({});
+  const [currentTip, setCurrentTip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
+  
+  // Welcome Screen State
+  const [showWelcome, setShowWelcome] = useState(() => {
+    // If no data in local storage, show welcome
+    return !localStorage.getItem('cuentas_claras_data');
+  });
+  const [welcomeTitle, setWelcomeTitle] = useState("");
+
+  // Ref for file input
+  const fileInputRef = useRef(null);
+  const welcomeFileInputRef = useRef(null);
+
+  // Derived state for current active bill
+  const activeBill = useMemo(() => 
+    bills.find(b => b.id === activeBillId) || bills[0], 
+  [bills, activeBillId]);
+
+  // --- Effects ---
+
+  useEffect(() => {
+    if (!showWelcome) {
+      localStorage.setItem('cuentas_claras_data', JSON.stringify(bills));
+      localStorage.setItem('cuentas_claras_active_id', activeBillId);
+    }
+  }, [bills, activeBillId, showWelcome]);
+
+  useEffect(() => {
+    localStorage.setItem('cuentas_claras_groups', JSON.stringify(savedGroups));
+  }, [savedGroups]);
+
+  // --- Logic / Calculations ---
+
+  const calculatedResults = useMemo(() => {
+    if (!activeBill) return { 
+      byPerson: {}, billSubtotal: 0, billTotal: 0, totalTip: 0, unallocatedTotal: 0, difference: 0, isMismatch: false 
+    };
+
+    const totals = {};
+    const subtotalByPerson = {};
+    const detailsByPerson = {};
+    
+    activeBill.people.forEach(p => {
+      totals[p] = 0;
+      subtotalByPerson[p] = 0;
+      detailsByPerson[p] = [];
+    });
+
+    let billSubtotal = 0;
+    let unallocatedTotal = 0;
+
+    activeBill.items.forEach(item => {
+      const price = parseFloat(item.price) || 0;
+      
+      let totalShares = 0;
+      activeBill.people.forEach(p => {
+          let qty = parseFloat(item.shares[p]) || 0;
+          let splitCount = parseInt(item.splitCount);
+          if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+          if (splitCount > 1 && qty > 0) qty = 1; 
+          totalShares += qty;
+      });
+
+      let targetSplit = parseInt(item.splitCount);
+      if (isNaN(targetSplit) || targetSplit < 1) targetSplit = 1;
+
+      let lineTotal = 0;
+      let costPerUnit = 0;
+
+      if (targetSplit === 1) {
+        // Mode 1: Unit Price (Price is per unit/person)
+        costPerUnit = price;
+        lineTotal = price * totalShares;
+      } else {
+        // Mode 2: Fixed Split (Price is Total, Split by Fixed N)
+        costPerUnit = price / targetSplit;
+        lineTotal = costPerUnit * totalShares; 
+        unallocatedTotal += (price - lineTotal);
+      }
+
+      if (targetSplit === 1) {
+         billSubtotal += lineTotal;
+      } else {
+         billSubtotal += price; 
+      }
+
+      if (costPerUnit > 0) {
+        activeBill.people.forEach(p => {
+            let quantity = parseFloat(item.shares[p]) || 0;
+            if (targetSplit > 1 && quantity > 0) quantity = 1;
+
+            if (quantity > 0) {
+                const itemCost = costPerUnit * quantity;
+                subtotalByPerson[p] += itemCost;
+                
+                detailsByPerson[p].push({
+                  name: item.name,
+                  quantity: quantity,
+                  cost: itemCost,
+                  isSplit: targetSplit > 1,
+                  splitCount: targetSplit
+                });
+            }
+        });
+      }
+    });
+
+    const tipMultiplier = activeBill.tipPercent / 100;
+    let totalBill = 0;
+    let totalTip = 0;
+
+    activeBill.people.forEach(p => {
+      const sub = subtotalByPerson[p];
+      const tip = sub * tipMultiplier;
+      totals[p] = {
+        subtotal: sub,
+        tip: tip,
+        total: sub + tip,
+        items: detailsByPerson[p]
+      };
+      totalBill += (sub + tip);
+      totalTip += tip;
+    });
+
+    const enteredTotal = parseFloat(activeBill.verificationTotal) || 0;
+    const difference = enteredTotal > 0 ? totalBill - enteredTotal : 0;
+    const isMismatch = enteredTotal > 0 && Math.abs(difference) > 5;
+
+    return { 
+      byPerson: totals, 
+      billSubtotal, 
+      billTotal: totalBill, 
+      totalTip,
+      unallocatedTotal,
+      difference,
+      isMismatch
+    };
+  }, [activeBill]);
+
+  // --- Handlers & History ---
+
+  const saveHistory = () => {
+    setHistory(prev => {
+        const newHistory = [...prev, { bills: JSON.parse(JSON.stringify(bills)), activeBillId }];
+        return newHistory.length > 50 ? newHistory.slice(1) : newHistory;
+    });
+    setFuture([]); 
+  };
+
+  const handleUndo = useCallback(() => {
+    if (history.length === 0) return;
+    const previous = history[history.length - 1];
+    const current = { bills: JSON.parse(JSON.stringify(bills)), activeBillId };
+    setFuture(prev => [...prev, current]);
+    setBills(previous.bills);
+    setActiveBillId(previous.activeBillId);
+    setHistory(prev => prev.slice(0, -1));
+  }, [history, bills, activeBillId]);
+
+  const handleRedo = useCallback(() => {
+    if (future.length === 0) return;
+    const next = future[future.length - 1];
+    const current = { bills: JSON.parse(JSON.stringify(bills)), activeBillId };
+    setHistory(prev => [...prev, current]);
+    setBills(next.bills);
+    setActiveBillId(next.activeBillId);
+    setFuture(prev => prev.slice(0, -1));
+  }, [future, bills, activeBillId]);
+
+  const togglePersonExpand = (person) => {
+    setExpandedPeople(prev => ({
+      ...prev,
+      [person]: !prev[person]
+    }));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      }
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  // --- Group Handlers ---
+
+  const handleSaveGroup = () => {
+    if (!newGroupName.trim()) return;
+    const newGroup = {
+      id: generateId(),
+      name: newGroupName,
+      people: activeBill.people
+    };
+    setSavedGroups(prev => [...prev, newGroup]);
+    setNewGroupName("");
+  };
+
+  const handleLoadGroup = (groupPeople) => {
+    if (!groupPeople || groupPeople.length === 0) return;
+    
+    saveHistory(); // Save before replacing
+    
+    // Replace current people with group people
+    // We need to re-initialize shares for the new people list
+    const newItems = activeBill.items.map(item => ({
+      ...item,
+      shares: groupPeople.reduce((acc, p) => ({ 
+        ...acc, 
+        [p]: item.shares[p] || 0 // Keep share if name matches, else 0
+      }), {})
+    }));
+
+    updateBill({ 
+      people: groupPeople,
+      items: newItems
+    }, false); 
+    
+    setShowGroupModal(false);
+  };
+
+  const handleDeleteGroup = (groupId) => {
+    setSavedGroups(prev => prev.filter(g => g.id !== groupId));
+  };
+
+  // --- Handlers ---
+
+  const handleStartWithTitle = () => {
+    if (!welcomeTitle.trim()) return;
+    updateBill({ name: welcomeTitle }, false); // Update current placeholder bill
+    setShowWelcome(false);
+  };
+
+  const updateBill = (updates, shouldSave = true) => {
+    if (shouldSave) saveHistory();
+    setBills(prev => prev.map(b => b.id === activeBillId ? { ...b, ...updates } : b));
+  };
+
+  const addPerson = () => {
+    const newName = `Persona ${activeBill.people.length + 1}`;
+    updateBill({ 
+        people: [...activeBill.people, newName],
+        items: activeBill.items.map(item => ({
+            ...item,
+            shares: { ...item.shares, [newName]: 0 } 
+        }))
+    });
+  };
+
+  const removePerson = (name) => {
+    if (activeBill.people.length <= 1) return;
+    updateBill({ 
+      people: activeBill.people.filter(p => p !== name),
+      items: activeBill.items.map(item => {
+        const newShares = { ...item.shares };
+        delete newShares[name];
+        return { ...item, shares: newShares };
+      })
+    });
+  };
+
+  const renamePerson = (oldName, newName) => {
+    if (activeBill.people.includes(newName)) return;
+    const newPeople = activeBill.people.map(p => p === oldName ? newName : p);
+    const newItems = activeBill.items.map(item => {
+      const newShares = { ...item.shares };
+      if (newShares.hasOwnProperty(oldName)) {
+        newShares[newName] = newShares[oldName];
+        delete newShares[oldName];
+      }
+      return { ...item, shares: newShares };
+    });
+    updateBill({ people: newPeople, items: newItems });
+  };
+
+  const addItem = () => {
+    const initialShares = activeBill.people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
+    const newItem = { id: generateId(), name: '', price: 0, splitCount: 1, shares: initialShares };
+    updateBill({ items: [...activeBill.items, newItem] });
+  };
+
+  const updateItem = (itemId, field, value) => {
+    const newItems = activeBill.items.map(item => item.id === itemId ? { ...item, [field]: value } : item);
+    updateBill({ items: newItems });
+  };
+
+  const duplicateItem = (itemId) => {
+    const itemIndex = activeBill.items.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) return;
+
+    const originalItem = activeBill.items[itemIndex];
+    const newItem = {
+      ...originalItem,
+      id: generateId(),
+      shares: activeBill.people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {}) 
+    };
+
+    const newItems = [...activeBill.items];
+    newItems.splice(itemIndex + 1, 0, newItem);
+    
+    updateBill({ items: newItems });
+  };
+
+  const updateItemShare = (itemId, person, value) => {
+    const newItems = activeBill.items.map(item => {
+      if (item.id === itemId) {
+        let val = parseFloat(value);
+        if (isNaN(val) || val < 0) val = 0;
+        return { 
+          ...item, 
+          shares: { ...item.shares, [person]: val } 
+        };
+      }
+      return item;
+    });
+    updateBill({ items: newItems });
+  };
+
+  const removeItem = (itemId) => {
+    updateBill({ items: activeBill.items.filter(i => i.id !== itemId) });
+  };
+
+  const createNewBill = () => {
+    saveHistory(); 
+    const newBill = { ...EMPTY_BILL, id: generateId(), name: 'Nueva Cuenta' };
+    setBills([...bills, newBill]);
+    setActiveBillId(newBill.id);
+    setMobileMenuOpen(false);
+  };
+
+  const deleteBill = (id) => {
+    if (bills.length === 1) return;
+    saveHistory(); 
+    const newBills = bills.filter(b => b.id !== id);
+    setBills(newBills);
+    if (activeBillId === id) setActiveBillId(newBills[0].id);
+  };
+
+  // --- AI Handlers ---
+
+  const handleAiDraftMessage = async () => {
+    setIsAiLoading(true);
+    try {
+      const summaryData = activeBill.people.map(p => {
+        const data = calculatedResults.byPerson[p];
+        return `${p}: ${formatCurrency(data.total)} (Consumo: ${formatCurrency(data.subtotal)}, Propina: ${formatCurrency(data.tip)})`;
+      }).join('\n');
+      
+      const prompt = `Draft a friendly WhatsApp payment reminder message for a group based on these totals:\n${summaryData}\nTotal Bill: ${formatCurrency(calculatedResults.billTotal)}`;
+      
+      const systemInstruction = `You are "El Pariente", a friendly person splitting a bill. Be concise, polite, and use emojis. Mention that people can pay via transfer. IMPORTANT: Keep all monetary values in Chilean Pesos (CLP) exactly as provided (e.g. $10.000), do not convert to USD or change the format.`;
+      
+      const result = await fetchGemini(prompt, false, systemInstruction);
+      setAiDraftMessage(result);
+    } catch (error) { console.error(error); } finally { setIsAiLoading(false); }
+  };
+
+  // --- File I/O Functions ---
+
+  const exportBillToFile = () => {
+    const dataToSave = {
+      name: activeBill.name,
+      people: activeBill.people,
+      items: activeBill.items,
+      tipPercent: activeBill.tipPercent,
+      verificationTotal: activeBill.verificationTotal
+    };
+
+    const jsonString = JSON.stringify(dataToSave, null, 2);
+    const blob = new Blob([jsonString], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${activeBill.name.replace(/\s+/g, '_')}_data.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const importBillFromFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target.result;
+        const parsedData = JSON.parse(content);
+
+        if (!parsedData.items || !Array.isArray(parsedData.items) || !parsedData.people) {
+          alert("El archivo no tiene un formato válido de Cuentas Claras.");
+          return;
+        }
+
+        // Only save history if we are already started, otherwise just set initial state
+        if (!showWelcome) saveHistory();
+
+        const newBill = {
+          ...parsedData,
+          id: generateId(),
+          name: parsedData.name + (showWelcome ? "" : " (Importada)"),
+          items: parsedData.items.map(item => ({
+            ...item,
+            id: generateId()
+          }))
+        };
+
+        if (showWelcome) {
+          setBills([newBill]);
+          setActiveBillId(newBill.id);
+          setShowWelcome(false);
+        } else {
+          setBills(prev => [...prev, newBill]);
+          setActiveBillId(newBill.id);
+        }
+        alert("Cuenta cargada exitosamente!");
+
+      } catch (error) {
+        console.error("Error parsing file:", error);
+        alert("Error al leer el archivo.");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  if (!activeBill) return null;
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-slate-800 pb-20 sm:pb-4 relative">
+      
+      {/* --- WELCOME MODAL OVERLAY --- */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-[100] bg-emerald-900/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-emerald-600 p-8 text-center text-white">
+              <Calculator className="w-16 h-16 mx-auto mb-4 text-emerald-100" />
+              <h1 className="text-3xl font-bold mb-2">Tome tranquilo Pariente</h1>
+              <p className="text-emerald-100">Divide gastos fácil y rápido.</p>
+            </div>
+            <div className="p-8 space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Dale un nombre a la cuenta:</label>
+                <input 
+                  type="text" 
+                  value={welcomeTitle}
+                  onChange={(e) => setWelcomeTitle(e.target.value)}
+                  placeholder="Ej: Asado Viernes, Almuerzo Oficina..."
+                  className="w-full text-lg border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-0 outline-none transition-all"
+                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && handleStartWithTitle()}
+                />
+              </div>
+              
+              <button 
+                onClick={handleStartWithTitle}
+                disabled={!welcomeTitle.trim()}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                Comenzar <ArrowRight size={20} />
+              </button>
+
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">O carga una cuenta anterior</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+              </div>
+
+              <input 
+                type="file" 
+                ref={welcomeFileInputRef}
+                onChange={importBillFromFile} 
+                accept=".txt" 
+                className="hidden" 
+              />
+              <button 
+                onClick={() => welcomeFileInputRef.current.click()}
+                className="w-full bg-white border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <Upload size={20} /> Cargar Archivo .txt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- HEADER --- */}
+      <header className="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Calculator className="h-6 w-6" />
+            <h1 className="text-xl font-bold tracking-tight">Tome tranquilo Pariente</h1>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+             <div className="flex bg-emerald-800/50 rounded-lg p-1 space-x-1">
+               <button 
+                onClick={handleUndo}
+                disabled={history.length === 0}
+                className={`p-1.5 rounded-md transition-colors ${history.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
+                title="Deshacer (Ctrl+Z)"
+              >
+                <Undo size={18} />
+              </button>
+              <button 
+                onClick={handleRedo}
+                disabled={future.length === 0}
+                className={`p-1.5 rounded-md transition-colors ${future.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
+                title="Rehacer (Ctrl+Y)"
+              >
+                <Redo size={18} />
+              </button>
+             </div>
+
+             <button 
+              onClick={() => setShowHelp(!showHelp)}
+              className="p-2 hover:bg-emerald-600 rounded-full transition-colors hidden sm:block"
+              title="Instrucciones Detalladas"
+            >
+              <HelpCircle size={20} />
+            </button>
+            <div className="relative group">
+              <button 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="flex items-center space-x-2 bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-md transition-colors text-sm"
+              >
+                <FileText size={16} />
+                <span className="truncate max-w-[100px]">{activeBill.name}</span>
+                <ChevronRight size={16} className={`transform transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`} />
+              </button>
+              
+              {mobileMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 text-gray-800 p-2">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Mis Cuentas</div>
+                  <div className="max-h-60 overflow-y-auto space-y-1">
+                    {bills.map(bill => (
+                      <div 
+                        key={bill.id} 
+                        onClick={() => { setActiveBillId(bill.id); setMobileMenuOpen(false); }}
+                        className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${activeBillId === bill.id ? 'bg-emerald-100 text-emerald-800 font-medium' : 'hover:bg-gray-100'}`}
+                      >
+                        <span className="truncate">{bill.name}</span>
+                        {bills.length > 1 && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); deleteBill(bill.id); }}
+                            className="text-gray-400 hover:text-red-500 p-1"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t mt-2 pt-2">
+                    <button 
+                      onClick={createNewBill}
+                      className="w-full flex items-center justify-center space-x-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors"
+                    >
+                      <Plus size={16} />
+                      <span>Nueva Cuenta</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* --- INSTRUCTION BAR --- */}
+      <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-start gap-3 text-sm text-emerald-800">
+          <Info size={18} className="mt-0.5 text-emerald-600 flex-shrink-0" />
+          <div className="flex-1">
+            {currentTip}
+          </div>
+        </div>
+      </div>
+
+      {/* --- DETAILED HELP BANNER --- */}
+      {showHelp && (
+        <div className="bg-white border-b border-emerald-100 p-4 animate-in fade-in slide-in-from-top-4">
+          <div className="max-w-7xl mx-auto flex items-start justify-between">
+            <div className="text-sm text-gray-700 space-y-1">
+              <h3 className="font-bold flex items-center gap-2 text-emerald-800"><HelpCircle size={16}/> Instrucciones Detalladas:</h3>
+              <ul className="list-disc list-inside space-y-1 ml-1">
+                <li>Columna <strong>Precio</strong>: Valor del item.</li>
+                <li>Columna <strong>División</strong>: 
+                  <ul className="pl-4 list-circle">
+                    <li><strong>"No" o 1 (Por defecto):</strong> El precio es Unitario. Se multiplica por la cantidad consumida.</li>
+                    <li><strong>Mayor a 1 (ej: 4):</strong> El precio es Total. Se divide entre esa cantidad de porciones.</li>
+                  </ul>
+                </li>
+                <li><strong>Cantidades</strong>: Usa los botones - y + para ajustar cuánto consumió cada uno.</li>
+              </ul>
+            </div>
+            <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
+          </div>
+        </div>
+      )}
+
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 gap-6 flex flex-col lg:flex-row items-start overflow-hidden">
+        
+        {/* --- LEFT PANEL: THE GRID --- */}
+        <div className="w-full lg:w-3/4 flex flex-col gap-4">
+          
+          {/* Bill Settings Bar */}
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex items-center gap-4 flex-1 min-w-[300px]">
+              <div className="flex-1 min-w-[150px]">
+                <span className="text-sm font-medium text-gray-500 block mb-1">Titulo:</span>
+                <input 
+                  type="text" 
+                  value={activeBill.name} 
+                  onChange={(e) => updateBill({ name: e.target.value })}
+                  className="font-semibold text-lg border-b border-dashed border-gray-300 focus:border-emerald-500 focus:ring-0 outline-none bg-transparent w-full"
+                />
+              </div>
+              <div className="w-[160px]">
+                <span className="text-sm font-medium text-gray-500 block mb-1">Fecha:</span>
+                <div className="flex items-center gap-2 border-b border-dashed border-gray-300 pb-1">
+                  <Calendar size={16} className="text-gray-400" />
+                  <input 
+                    type="date" 
+                    value={activeBill.date}
+                    onChange={(e) => updateBill({ date: e.target.value })}
+                    className="font-semibold text-sm bg-transparent outline-none w-full text-slate-700" 
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+               <button
+                onClick={() => setShowGroupModal(true)}
+                className="flex items-center gap-1.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-indigo-200"
+                title="Gestionar Grupos de Personas"
+               >
+                 <Users size={16} /> <span className="hidden sm:inline">Grupos</span>
+               </button>
+               <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                <span className="text-sm font-medium text-gray-600">% Propina:</span>
+                <input 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  value={activeBill.tipPercent}
+                  onChange={(e) => updateBill({ tipPercent: parseFloat(e.target.value) || 0 })}
+                  className="w-16 bg-white border border-gray-300 rounded px-2 py-0.5 text-right font-medium focus:ring-1 focus:ring-emerald-500 outline-none"
+                />
+              </div>
+              <button 
+                onClick={exportBillToFile}
+                className="flex items-center gap-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-slate-300"
+                title="Guardar archivo .txt con todos los datos"
+              >
+                <Save size={16} /> <span className="hidden sm:inline">Guardar .txt</span>
+              </button>
+            </div>
+          </div>
+
+          {/* THE GRID CONTAINER */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+            <div className="overflow-x-auto pb-4">
+              <table className="w-full min-w-[600px] border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="p-3 sticky left-0 bg-gray-50 z-20 w-8">#</th>
+                    <th className="p-3 sticky left-8 bg-gray-50 z-20 min-w-[160px]">Item</th>
+                    <th className="p-3 w-28 text-right">Precio</th>
+                    <th className="p-3 w-32 text-center">División</th>
+                    {activeBill.people.map((person, idx) => (
+                      <th key={idx} className="p-2 min-w-[80px] text-center group relative">
+                        <input 
+                          type="text"
+                          value={person}
+                          onChange={(e) => renamePerson(person, e.target.value)}
+                          className="w-full bg-transparent text-center focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded px-1 outline-none text-emerald-900 font-bold"
+                        />
+                        <button 
+                          onClick={() => removePerson(person)}
+                          className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 bg-white rounded-full shadow-sm p-0.5 transition-opacity"
+                        >
+                          <X size={12} />
+                        </button>
+                      </th>
+                    ))}
+                    <th className="p-2 w-10 text-center">
+                      <button onClick={addPerson} className="text-emerald-600 hover:bg-emerald-100 p-1 rounded transition-colors" title="Agregar Persona">
+                        <Plus size={18} />
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-sm">
+                  {activeBill.items.map((item, idx) => {
+                    let totalShares = 0;
+                    activeBill.people.forEach(p => {
+                        let val = parseFloat(item.shares[p]) || 0;
+                        let splitCount = parseInt(item.splitCount);
+                        if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+                        if (splitCount > 1 && val > 0) val = 1; 
+                        totalShares += val;
+                    });
+                    
+                    let splitCount = parseInt(item.splitCount);
+                    if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+                    
+                    const isError = splitCount > 1 && splitCount !== totalShares;
+
+                    return (
+                      <tr key={item.id} className={`group ${isError ? 'bg-red-100 border-l-4 border-l-red-500 outline outline-2 outline-offset-[-2px] outline-red-300' : 'hover:bg-gray-50'}`}>
+                        <td className={`p-3 text-gray-400 sticky left-0 z-10 ${isError ? 'bg-red-100' : 'bg-white group-hover:bg-gray-50'}`}>
+                          {isError && <AlertCircle size={14} className="text-red-600 inline mr-1" />}
+                          {!isError && idx + 1}
+                        </td>
+                        <td className={`p-2 sticky left-8 z-10 ${isError ? 'bg-red-100' : 'bg-white group-hover:bg-gray-50'}`}>
+                          <input 
+                            type="text" 
+                            value={item.name}
+                            placeholder="Nombre del item"
+                            onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                            className="w-full bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors placeholder-gray-400"
+                          />
+                        </td>
+                        <td className="p-2">
+                          <input 
+                            type="number" 
+                            min="0"
+                            value={item.price === 0 ? '' : item.price}
+                            placeholder="0"
+                            onChange={(e) => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)}
+                            className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
+                          />
+                        </td>
+                        <td className="p-2 text-center border-l border-r border-gray-100 min-w-[120px]">
+                          <div className="flex items-center justify-center gap-1">
+                            <button 
+                              onClick={() => {
+                                const current = parseInt(item.splitCount) || 1;
+                                if (current > 1) updateItem(item.id, 'splitCount', current - 1);
+                              }}
+                              className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
+                                (parseInt(item.splitCount) || 1) > 1 
+                                  ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' 
+                                  : 'opacity-0 pointer-events-none'
+                              }`}
+                              tabIndex="-1"
+                            >
+                              <Minus size={12} />
+                            </button>
+
+                            <input 
+                              type="text" 
+                              inputMode="numeric"
+                              value={item.splitCount == 1 ? "No" : item.splitCount}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const num = parseInt(val);
+                                if (val === '') {
+                                  updateItem(item.id, 'splitCount', '');
+                                } else if (!isNaN(num)) {
+                                  updateItem(item.id, 'splitCount', num);
+                                }
+                              }}
+                              onBlur={() => {
+                                if (!item.splitCount || parseInt(item.splitCount) < 1) {
+                                  updateItem(item.id, 'splitCount', 1);
+                                }
+                              }}
+                              className={`w-10 text-center bg-transparent outline-none rounded py-0.5 transition-colors font-medium ${
+                                item.splitCount == 1 ? 'text-emerald-600' : 'text-slate-600'
+                              } ${
+                                isError ? 'text-red-700 font-bold bg-red-200/50' : ''
+                              }`}
+                            />
+
+                            <button 
+                              onClick={() => {
+                                const current = parseInt(item.splitCount) || 1;
+                                updateItem(item.id, 'splitCount', current + 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-slate-200 rounded transition-colors"
+                              tabIndex="-1"
+                            >
+                              <Plus size={12} />
+                            </button>
+                          </div>
+                        </td>
+                        {activeBill.people.map(person => {
+                          const quantity = parseFloat(item.shares[person]) || 0;
+                          
+                          if (splitCount > 1) {
+                            // CHECKBOX MODE (Split > 1)
+                            return (
+                                <td key={person} className="p-1 text-center border-l border-gray-50">
+                                    <div className="flex justify-center">
+                                        <input 
+                                            type="checkbox"
+                                            checked={quantity > 0}
+                                            onChange={(e) => updateItemShare(item.id, person, e.target.checked ? 1 : 0)}
+                                            className={`w-5 h-5 rounded cursor-pointer transition-colors ${isError ? 'accent-red-600' : 'accent-emerald-600'}`}
+                                        />
+                                    </div>
+                                </td>
+                            );
+                          }
+
+                          // COUNTER MODE (Unit Price, Split == 1 or "No")
+                          return (
+                            <td key={person} className="p-1 text-center border-l border-gray-50">
+                              <div className="flex items-center justify-center gap-1">
+                                <button 
+                                  onClick={() => updateItemShare(item.id, person, quantity - 1)}
+                                  className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
+                                    quantity > 0 
+                                      ? 'bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700' 
+                                      : 'opacity-0 pointer-events-none'
+                                  }`}
+                                  tabIndex="-1"
+                                >
+                                  <Minus size={12} />
+                                </button>
+                                
+                                <span className={`w-4 text-center font-bold text-sm ${
+                                  quantity > 0 ? 'text-emerald-700' : 'text-slate-300'
+                                }`}>
+                                  {quantity > 0 ? quantity : '-'}
+                                </span>
+
+                                <button 
+                                  onClick={() => updateItemShare(item.id, person, quantity + 1)}
+                                  className="w-6 h-6 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 rounded transition-colors"
+                                  tabIndex="-1"
+                                >
+                                  <Plus size={12} />
+                                </button>
+                              </div>
+                            </td>
+                          );
+                        })}
+                        <td className="p-2 text-center flex items-center justify-center gap-1">
+                          <button onClick={() => duplicateItem(item.id)} className="text-gray-400 hover:text-emerald-600 transition-colors" title="Duplicar">
+                            <Copy size={16} />
+                          </button>
+                          <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Eliminar">
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  <tr>
+                    <td colSpan={4 + activeBill.people.length + 1} className="p-4">
+                      <div className="flex items-center gap-4">
+                        <button 
+                          onClick={addItem}
+                          className="flex items-center gap-2 text-emerald-600 font-bold hover:bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 transition-all"
+                        >
+                          <Plus size={18} /> Agregar Fila
+                        </button>
+                        
+                        {/* Hidden file input for import */}
+                        <input 
+                          type="file" 
+                          ref={fileInputRef}
+                          onChange={importBillFromFile} 
+                          accept=".txt" 
+                          className="hidden" 
+                        />
+                        
+                        <button 
+                          onClick={() => fileInputRef.current.click()}
+                          className="flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100 transition-all"
+                        >
+                          <Upload size={18} /> Cargar Cuenta (.txt)
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* --- RIGHT PANEL: RESULTS --- */}
+        <div className="w-full lg:w-1/4 flex flex-col gap-4">
+          <div className="bg-slate-800 text-white rounded-xl shadow-lg p-6 sticky top-24 flex flex-col h-fit">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
+              <DollarSign size={20} />
+              Resumen de Pago
+            </h2>
+
+            <div className="space-y-4 mb-6 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
+              {activeBill.people.map(person => {
+                const data = calculatedResults.byPerson[person];
+                if (!data) return null;
+                const isExpanded = expandedPeople[person];
+
+                return (
+                  <div key={person} className="flex flex-col border-b border-slate-700 pb-2 last:border-0">
+                    <div className="flex justify-between items-baseline mb-1 cursor-pointer hover:bg-slate-700/50 rounded p-1" onClick={() => togglePersonExpand(person)}>
+                      <div className="flex items-center gap-2">
+                        {isExpanded ? <ChevronUp size={14} className="text-slate-400"/> : <ChevronDown size={14} className="text-slate-400"/>}
+                        <span className="font-semibold text-slate-200">{person}</span>
+                      </div>
+                      <span className="text-xl font-bold text-emerald-400">{formatCurrency(data.total)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400 px-1">
+                      <span>Consumo: {formatCurrency(data.subtotal)}</span>
+                      <span>+ Propina: {formatCurrency(data.tip)}</span>
+                    </div>
+                    
+                    {/* Collapsible Details */}
+                    {isExpanded && (
+                      <div className="bg-slate-700/30 p-2 rounded mt-1 text-xs space-y-1 animate-in slide-in-from-top-1 fade-in duration-200">
+                        {data.items.length > 0 ? (
+                          data.items.map((detail, idx) => (
+                            <div key={idx} className="flex justify-between text-slate-300">
+                              <span className="truncate max-w-[130px]">
+                                {detail.name || "Item sin nombre"} 
+                                {detail.quantity > 1 && <span className="text-slate-500 ml-1">x{detail.quantity}</span>}
+                                {detail.isSplit && <span className="text-slate-500 ml-1">(1/{detail.splitCount})</span>}
+                              </span>
+                              <span>{formatCurrency(detail.cost)}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-slate-500 text-center italic">Sin consumos</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-4 border-t border-slate-600 space-y-2">
+              <div className="flex justify-between text-sm text-slate-400">
+                <span>Subtotal Items</span>
+                <span>{formatCurrency(calculatedResults.billSubtotal)}</span>
+              </div>
+               <div className="flex justify-between text-sm text-slate-400">
+                <span>Total Propina ({activeBill.tipPercent}%)</span>
+                <span>{formatCurrency(calculatedResults.totalTip)}</span>
+              </div>
+              
+              {Math.abs(calculatedResults.unallocatedTotal) > 1 && (
+                <div className="flex justify-between text-sm font-bold text-red-400 mt-2 bg-red-900/30 p-2 rounded">
+                  <span>Por Asignar/Error:</span>
+                  <span>{formatCurrency(calculatedResults.unallocatedTotal)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between items-end mt-4 pt-2 border-t border-slate-700">
+                <span className="font-bold text-lg">Gran Total</span>
+                <span className="font-extrabold text-3xl text-white">{formatCurrency(calculatedResults.billTotal)}</span>
+              </div>
+            </div>
+
+            {/* --- VERIFICATION SECTION --- */}
+            <div className="mt-6 pt-6 border-t border-slate-600 flex flex-col gap-3">
+              <div>
+                <label className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Verificar con Boleta</label>
+                <div className="relative">
+                  <span className="absolute left-2 top-1.5 text-slate-500 font-bold">$</span>
+                  <input 
+                    type="number"
+                    placeholder="Total Boleta..."
+                    value={activeBill.verificationTotal}
+                    onChange={(e) => updateBill({ verificationTotal: e.target.value })}
+                    className={`w-full bg-slate-700 text-white rounded px-3 pl-6 py-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-right ${calculatedResults.isMismatch ? 'ring-2 ring-red-500' : ''}`}
+                  />
+                </div>
+              </div>
+
+              {activeBill.verificationTotal && (
+                <div className={`text-center text-sm font-bold p-2 rounded flex justify-between items-center ${calculatedResults.isMismatch ? 'bg-red-900/50 text-red-300' : 'bg-emerald-900/50 text-emerald-300'}`}>
+                  <span>{calculatedResults.isMismatch ? 'Faltan/Sobran:' : '¡Cuadra!'}</span>
+                  <span>{formatCurrency(Math.abs(calculatedResults.difference))}</span>
+                </div>
+              )}
+
+              <button 
+                onClick={handleAiDraftMessage}
+                disabled={isAiLoading || activeBill.items.length === 0}
+                className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50"
+              >
+                {isAiLoading ? <Loader2 size={18} className="animate-spin" /> : <MessageSquare size={18} />}
+                Cobrar por WhatsApp ✨
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      {/* --- FEATURES FOOTER --- */}
+      <footer className="max-w-7xl mx-auto w-full px-6 py-12 mt-8 border-t border-gray-200">
+        <h3 className="text-xl font-bold text-slate-700 mb-6 text-center">Todo lo que puedes hacer</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {FEATURES.map((feat, idx) => (
+            <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                {feat.icon}
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800">{feat.title}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{feat.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </footer>
+
+      {/* --- AI DRAFT MESSAGE MODAL --- */}
+      {aiDraftMessage && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="bg-emerald-600 p-4 text-white flex justify-between items-center">
+              <span className="font-bold flex items-center gap-2"><MessageSquare size={18}/> Borrador Generado ✨</span>
+              <button onClick={() => setAiDraftMessage("")} className="hover:bg-emerald-700 p-1 rounded"><X size={20}/></button>
+            </div>
+            <div className="p-6">
+              <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-emerald-900 font-sans whitespace-pre-wrap mb-6 max-h-[50vh] overflow-y-auto">
+                {aiDraftMessage}
+              </div>
+              <button 
+                onClick={() => {
+                  copyToClipboard(aiDraftMessage);
+                  setAiDraftMessage("");
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all"
+              >
+                <Clipboard size={18}/> Copiar y Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- GROUPS MODAL --- */}
+      {showGroupModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-indigo-600 p-6 text-white flex justify-between items-center">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Users size={20}/> Gestionar Grupos</h3>
+              <button onClick={() => setShowGroupModal(false)} className="text-indigo-200 hover:text-white"><X size={24}/></button>
+            </div>
+            <div className="p-6 space-y-6">
+              
+              {/* Save Current Group */}
+              <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <h4 className="font-bold text-indigo-900 mb-2 text-sm uppercase tracking-wide">Guardar Grupo Actual</h4>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    placeholder="Nombre del grupo (ej: Familia, Oficina)"
+                    className="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+                  <button 
+                    onClick={handleSaveGroup}
+                    disabled={!newGroupName.trim()}
+                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white p-2 rounded-lg transition-colors"
+                  >
+                    <Save size={18} />
+                  </button>
+                </div>
+                <p className="text-xs text-indigo-400 mt-2">
+                  Se guardarán: {activeBill.people.join(", ")}
+                </p>
+              </div>
+
+              {/* Saved Groups List */}
+              <div>
+                <h4 className="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wide">Grupos Guardados</h4>
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  {savedGroups.length === 0 ? (
+                    <p className="text-gray-400 text-sm italic">No hay grupos guardados aún.</p>
+                  ) : (
+                    savedGroups.map(group => (
+                      <div key={group.id} className="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-lg hover:shadow-sm transition-shadow">
+                        <div className="overflow-hidden">
+                          <p className="font-bold text-gray-800 truncate">{group.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{group.people.join(", ")}</p>
+                        </div>
+                        <div className="flex gap-2 ml-2">
+                          <button 
+                            onClick={() => handleLoadGroup(group.people)}
+                            className="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded transition-colors text-xs font-bold border border-emerald-200"
+                          >
+                            Cargar
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteGroup(group.id)}
+                            className="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
