@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuentas Claras - Tome tranquilo Pariente</title>
+    <title>Cuentas Claras - Tome tranquilo Pariente-@mendezrein</title>
+    <link rel="icon" href="https://www.google.com/s2/favicons?sz=64&domain=excel.cloud.microsoft">
 
     <!--
                                       /$$                     
@@ -124,6 +125,8 @@
             <span key="7"><strong>Tip Rápido:</strong> La fila se pone <span className="bg-red-100 text-red-700 px-1 font-bold border border-red-300 rounded">ROJA</span> si la división no coincide con los seleccionados.</span>
         ];
 
+        const PRESETS = ["Cerveza 🍺", "Hamburguesa 🍔", "Papas 🍟", "Pizza 🍕", "Tragos 🍹", "Bebidas 🥤", "Carnes 🥩"];
+
         const FEATURES = [
             { icon: <Calculator size={24}/>, title: "División Flexible", desc: "Divide items por unidad (quién comió cuántos) o compártelos equitativamente entre varios (ej: una pizza entre 4)." },
             { icon: <MessageSquare size={24}/>, title: "Cobro por WhatsApp", desc: "Genera un mensaje cordial con el resumen exacto por persona, listo para copiar y enviar al grupo." },
@@ -132,6 +135,34 @@
             { icon: <CheckCircle2 size={24}/>, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
             { icon: <FileText size={24}/>, title: "Respaldo Fácil", desc: "Guarda y carga cuentas individuales (.txt) o exporta tus grupos para usarlos en otro dispositivo." }
         ];
+
+        // --- Components ---
+
+        const PriceInput = ({ value, onChange }) => {
+            const [isFocused, setIsFocused] = useState(false);
+            
+            // Format only when not focused
+            const displayValue = isFocused 
+                ? (value === 0 ? '' : value)
+                : (value === 0 ? '' : formatCurrency(value));
+
+            return (
+                <input 
+                    type="text"
+                    inputMode="numeric"
+                    value={displayValue}
+                    placeholder="$0"
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    onChange={(e) => {
+                        // Allow only numbers
+                        const rawVal = e.target.value.replace(/\D/g, '');
+                        onChange(rawVal === '' ? 0 : parseInt(rawVal, 10));
+                    }}
+                    className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
+                />
+            );
+        };
 
         // --- Initial Data ---
 
@@ -218,6 +249,12 @@
             const [showWelcome, setShowWelcome] = useState(true);
             const [welcomeTitle, setWelcomeTitle] = useState("");
             
+            // Quick Start State
+            const [qsPeopleCount, setQsPeopleCount] = useState(2);
+            const [qsGroupId, setQsGroupId] = useState("");
+            const [qsSelectedPresets, setQsSelectedPresets] = useState([]);
+            const [qsMode, setQsMode] = useState('count'); // 'count' or 'group'
+
             // Delete Confirm Modal State
             const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -452,19 +489,80 @@
 
             // --- Handlers ---
 
-            const handleStartWithTitle = () => {
-                if (!welcomeTitle.trim()) return;
+            const handleQuickStart = () => {
+                // 1. Determine People
+                let people = [];
+                if (qsMode === 'group' && qsGroupId) {
+                    const group = savedGroups.find(g => g.id === qsGroupId);
+                    if (group) people = [...group.people];
+                }
+                
+                if (people.length === 0) {
+                    // Fallback to count if group is invalid or mode is count
+                    const count = Math.max(1, parseInt(qsPeopleCount) || 2);
+                    people = Array.from({ length: count }, (_, i) => `Persona ${i + 1}`);
+                }
+
+                // 2. Determine Items
+                const initialItems = qsSelectedPresets.map(name => {
+                    const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
+                    return {
+                        id: generateId(),
+                        name: name,
+                        price: 0,
+                        splitCount: 1,
+                        shares: shares
+                    };
+                });
+
+                if (initialItems.length === 0) {
+                    // Add one empty item if nothing selected
+                    const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
+                    initialItems.push({ 
+                        id: generateId(), 
+                        name: '', 
+                        price: 0, 
+                        splitCount: 1, 
+                        shares: shares 
+                    });
+                }
+
+                // 3. Create Bill
+                const name = welcomeTitle.trim() || `Cuenta ${new Date().toLocaleDateString('es-CL').slice(0, 5)}`;
                 
                 const isDefaultBill = bills.length === 1 && bills[0].id === 'default' && !bills[0].name;
+                const newBillData = {
+                    name,
+                    people,
+                    items: initialItems,
+                    date: new Date().toISOString().split('T')[0],
+                    tipPercent: 10,
+                    verificationTotal: ''
+                };
 
                 if (isDefaultBill) {
-                    updateBill({ name: welcomeTitle }, false);
+                    updateBill(newBillData, false);
                 } else {
-                    const newBill = { ...EMPTY_BILL, id: generateId(), name: welcomeTitle };
+                    const newBill = { ...newBillData, id: generateId() };
                     setBills(prev => [...prev, newBill]);
                     setActiveBillId(newBill.id);
                 }
+                
+                saveHistory();
                 setShowWelcome(false);
+                setWelcomeTitle("");
+                setQsSelectedPresets([]);
+            };
+
+            const togglePreset = (item) => {
+                setQsSelectedPresets(prev => 
+                    prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+                );
+            };
+
+            const handleStartWithTitle = () => {
+                // Legacy handler kept for "Enter" key on title input, mapped to quick start now
+                handleQuickStart();
             };
 
             const updateBill = (updates, shouldSave = true) => {
@@ -646,26 +744,6 @@
                 setMobileMenuOpen(false);
             };
 
-            const exportAllData = () => {
-                const data = {
-                    type: 'full_backup',
-                    timestamp: new Date().toISOString(),
-                    bills: bills,
-                    groups: savedGroups
-                };
-                const jsonString = JSON.stringify(data, null, 2);
-                const blob = new Blob([jsonString], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `CuentasClaras_Respaldo_${new Date().toISOString().split('T')[0]}.txt`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                setMobileMenuOpen(false);
-            };
-
             const exportGroupsToFile = () => {
                 const data = {
                     type: 'groups_backup',
@@ -812,48 +890,48 @@
                 {showWelcome && (
                     <div className="fixed inset-0 z-[100] bg-emerald-900/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto">
-                        <div className="bg-emerald-600 p-8 text-center text-white sticky top-0 z-10">
-                        <Calculator className="w-16 h-16 mx-auto mb-4 text-emerald-100" />
-                        <h1 className="text-3xl font-bold mb-2">Tome tranquilo Pariente</h1>
-                        <p className="text-emerald-100">Divide gastos fácil y rápido.</p>
+                        <div className="bg-emerald-600 p-6 text-center text-white sticky top-0 z-10 shadow-md">
+                        <Calculator className="w-12 h-12 mx-auto mb-2 text-emerald-100" />
+                        <h1 className="text-2xl font-bold mb-1">Tome tranquilo Pariente</h1>
+                        <p className="text-emerald-100 text-sm">Divide gastos fácil y rápido.</p>
                         </div>
-                        <div className="p-8 space-y-6">
+                        <div className="p-6 space-y-6">
                         
                         {/* CONTINUE WITH LAST BILL SECTION */}
                         {hasSavedData && (
-                            <div className="mb-6 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
-                                <h3 className="text-emerald-800 font-bold mb-3 text-xs uppercase tracking-wide">Continuar donde quedaste</h3>
+                            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 shadow-sm">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h3 className="text-emerald-800 font-bold text-xs uppercase tracking-wide">Continuar donde quedaste</h3>
+                                    {bills.length > 1 && (
+                                        <div className="relative">
+                                            <select 
+                                                onChange={(e) => setActiveBillId(e.target.value)}
+                                                value={activeBillId}
+                                                className="bg-white text-emerald-900 border border-emerald-200 rounded py-1 pl-2 pr-6 text-xs outline-none focus:ring-1 focus:ring-emerald-400 appearance-none cursor-pointer"
+                                            >
+                                                {bills.map(b => (
+                                                    <option key={b.id} value={b.id}>
+                                                        {b.name || "Sin nombre"}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="absolute right-1 top-1.5 text-emerald-400 pointer-events-none" size={12}/>
+                                        </div>
+                                    )}
+                                </div>
                                 <button 
                                 onClick={() => setShowWelcome(false)}
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg mb-3 transition-colors shadow-md flex items-center justify-between px-4"
+                                className="w-full bg-white hover:bg-emerald-100 border-2 border-emerald-500 text-emerald-700 font-bold py-3 rounded-lg transition-colors flex items-center justify-between px-4 group"
                                 >
                                 <div className="flex flex-col items-start text-left overflow-hidden mr-2">
-                                    <span className="text-xs font-normal opacity-90">Continuar con la última cuenta:</span>
-                                    <span className="truncate w-full text-lg">{activeBill.name || "Cuenta sin nombre"}</span>
+                                    <span className="truncate w-full text-lg group-hover:text-emerald-800">{activeBill.name || "Cuenta sin nombre"}</span>
                                 </div>
-                                <ArrowRight size={24} className="flex-shrink-0" />
+                                <ArrowRight size={24} className="flex-shrink-0 group-hover:translate-x-1 transition-transform" />
                                 </button>
-                                
-                                {bills.length > 1 && (
-                                    <div className="relative">
-                                        <select 
-                                            onChange={(e) => setActiveBillId(e.target.value)}
-                                            value={activeBillId}
-                                            className="w-full bg-white text-emerald-900 border border-emerald-200 rounded-lg py-2 pl-3 pr-10 outline-none focus:ring-2 focus:ring-emerald-400 appearance-none text-sm cursor-pointer shadow-sm"
-                                        >
-                                            {bills.map(b => (
-                                                <option key={b.id} value={b.id}>
-                                                    {b.name || "Sin nombre"} ({b.date})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-2.5 text-emerald-400 pointer-events-none" size={16}/>
-                                    </div>
-                                )}
                             </div>
                         )}
 
-                        {/* NEW BILL SECTION */}
+                        {/* NEW BILL / QUICK START SECTION */}
                         <div>
                             {hasSavedData && (
                                 <div className="relative flex py-2 items-center mb-4">
@@ -863,43 +941,103 @@
                                 </div>
                             )}
 
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    {hasSavedData ? "Nombre de la nueva cuenta:" : "Dale un nombre a la cuenta:"}
-                                </label>
-                                <input 
-                                type="text" 
-                                value={welcomeTitle}
-                                onChange={(e) => setWelcomeTitle(e.target.value)}
-                                placeholder="Ej: Asado Viernes, Almuerzo Oficina..."
-                                className="w-full text-lg border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-0 outline-none transition-all"
-                                autoFocus={!hasSavedData}
-                                onKeyDown={(e) => e.key === 'Enter' && handleStartWithTitle()}
-                                />
+                            <div className="space-y-4">
+                                {/* Title Input */}
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">1. Nombre (Opcional)</label>
+                                    <input 
+                                    type="text" 
+                                    value={welcomeTitle}
+                                    onChange={(e) => setWelcomeTitle(e.target.value)}
+                                    placeholder="Ej: Asado Viernes..."
+                                    className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                    autoFocus={!hasSavedData}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleQuickStart()}
+                                    />
+                                </div>
+
+                                {/* People Selection */}
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">2. ¿Quiénes participan?</label>
+                                    <div className="flex gap-2 mb-2">
+                                        <button 
+                                            onClick={() => setQsMode('count')}
+                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'count' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                        >
+                                            Número
+                                        </button>
+                                        <button 
+                                            onClick={() => setQsMode('group')}
+                                            disabled={savedGroups.length === 0}
+                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'group' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'} ${savedGroups.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        >
+                                            Grupo Guardado
+                                        </button>
+                                    </div>
+
+                                    {qsMode === 'count' ? (
+                                        <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                            <button onClick={() => setQsPeopleCount(Math.max(1, qsPeopleCount - 1))} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Minus size={16}/></button>
+                                            <span className="font-bold text-lg w-8 text-center">{qsPeopleCount}</span>
+                                            <button onClick={() => setQsPeopleCount(qsPeopleCount + 1)} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Plus size={16}/></button>
+                                            <span className="text-sm text-gray-500 ml-2">Personas</span>
+                                        </div>
+                                    ) : (
+                                        <select 
+                                            value={qsGroupId} 
+                                            onChange={(e) => setQsGroupId(e.target.value)}
+                                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+                                        >
+                                            <option value="">Selecciona un grupo...</option>
+                                            {savedGroups.map(g => (
+                                                <option key={g.id} value={g.id}>{g.name} ({g.people.length} p.)</option>
+                                            ))}
+                                        </select>
+                                    )}
+                                </div>
+
+                                {/* Items Presets */}
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">3. Agregar Items (Opcional)</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {PRESETS.map(item => (
+                                            <button
+                                                key={item}
+                                                onClick={() => togglePreset(item)}
+                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                                                    qsSelectedPresets.includes(item)
+                                                        ? 'bg-emerald-100 border-emerald-300 text-emerald-800 ring-2 ring-emerald-500 ring-offset-1'
+                                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                {item}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                             
                             <button 
-                                onClick={handleStartWithTitle}
-                                disabled={!welcomeTitle.trim()}
-                                className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                                onClick={handleQuickStart}
+                                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
                             >
-                                {hasSavedData ? "Crear Nueva" : "Comenzar"} <Plus size={20} />
+                                <Plus size={20} /> Crear Cuenta Rápida
                             </button>
                         </div>
 
                         {/* IMPORT SECTION */}
                         <div className="relative flex py-2 items-center">
                             <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">O carga una cuenta guardada</span>
+                            <span className="flex-shrink-0 mx-4 text-gray-400 text-[10px] uppercase">O carga una cuenta guardada</span>
                             <div className="flex-grow border-t border-gray-300"></div>
                         </div>
 
                         {/* Button triggers the hidden input at top of app */}
                         <button 
                             onClick={() => welcomeFileInputRef.current.click()}
-                            className="w-full bg-white border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
                         >
-                            <Upload size={20} /> Cargar Cuenta (.txt)
+                            <Upload size={16} /> Cargar Cuenta (.txt)
                         </button>
                         </div>
                     </div>
@@ -934,6 +1072,14 @@
                             <Redo size={18} />
                         </button>
                         </div>
+
+                        <button 
+                            onClick={createNewBill}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-md transition-colors shadow-sm border border-emerald-500 flex items-center justify-center"
+                            title="Nueva Cuenta Rápida"
+                        >
+                            <Plus size={20} />
+                        </button>
 
                         <div className="relative group">
                         <button 
@@ -1186,13 +1332,9 @@
                                     />
                                     </td>
                                     <td className="p-2">
-                                    <input 
-                                        type="number" 
-                                        min="0"
-                                        value={item.price === 0 ? '' : item.price}
-                                        placeholder="0"
-                                        onChange={(e) => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)}
-                                        className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
+                                    <PriceInput 
+                                        value={item.price} 
+                                        onChange={(val) => updateItem(item.id, 'price', val)} 
                                     />
                                     </td>
                                     <td className="p-2 text-center border-l border-r border-gray-100 min-w-[120px]">
@@ -1466,6 +1608,17 @@
                         </div>
                         </div>
                     ))}
+                    </div>
+
+                    <div className="mt-12 text-center pt-8 border-t border-gray-100">
+                        <a 
+                            href="https://mendezrein.github.io/landing/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                        >
+                            🤖 @mendezrein links
+                        </a>
                     </div>
                 </footer>
 
