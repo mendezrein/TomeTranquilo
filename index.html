@@ -261,6 +261,7 @@
             const [qsMode, setQsMode] = useState('manual'); // 'count', 'manual', or 'group'
             const [qsTotal, setQsTotal] = useState(""); // New state for Total
             const [qsTipPercent, setQsTipPercent] = useState(10); // Tip Percent State
+            const [qsErrors, setQsErrors] = useState({}); // New Error State
 
             // Selection State
             const [selectedItemId, setSelectedItemId] = useState(null);
@@ -498,6 +499,8 @@
             // --- Handlers ---
 
             const handleQuickStart = () => {
+                const newErrors = {};
+                
                 // Validation for Total Bill
                 let verifTotal = 0;
                 if (typeof qsTotal === 'string') {
@@ -507,23 +510,34 @@
                 }
 
                 if (verifTotal <= 0) {
-                    alert("Por favor ingresa el Total de la Boleta para comenzar.");
-                    return;
+                    newErrors.total = true;
                 }
 
                 // 1. Determine People
                 let people = [];
-                if (qsMode === 'group' && qsGroupId) {
-                    const group = savedGroups.find(g => g.id === qsGroupId);
-                    if (group) people = [...group.people];
+                if (qsMode === 'group') {
+                     if (qsGroupId) {
+                        const group = savedGroups.find(g => g.id === qsGroupId);
+                        if (group) people = [...group.people];
+                    } else {
+                        newErrors.group = true;
+                    }
                 } else if (qsMode === 'manual') {
                     // Manual mode logic
                     people = qsManualNames.split(',').map(n => n.trim()).filter(n => n !== "");
                     if (people.length === 0) {
-                        alert("Por favor ingresa al menos un nombre en la lista manual.");
-                        return;
+                        newErrors.manualNames = true;
                     }
                 }
+                
+                // If we have errors, set them and stop
+                if (Object.keys(newErrors).length > 0) {
+                    setQsErrors(newErrors);
+                    return;
+                }
+                
+                // Clear errors if everything is fine
+                setQsErrors({});
                 
                 if (people.length === 0) {
                     // Fallback to count if group is invalid or mode is count
@@ -1105,19 +1119,25 @@
                                         <div className="relative">
                                             <textarea
                                                 value={qsManualNames}
-                                                onChange={(e) => setQsManualNames(e.target.value)}
+                                                onChange={(e) => {
+                                                    setQsManualNames(e.target.value);
+                                                    if (qsErrors.manualNames) setQsErrors(prev => ({...prev, manualNames: false}));
+                                                }}
                                                 placeholder="Ej: Juan, Pedro, Diego..."
-                                                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 resize-none h-20"
+                                                className={`w-full bg-white border ${qsErrors.manualNames ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all`}
                                             />
-                                            <span className="text-[10px] text-gray-400 absolute bottom-2 right-2">Separados por comas</span>
+                                            <span className={`text-[10px] absolute bottom-2 right-2 ${qsErrors.manualNames ? 'text-red-500 font-bold' : 'text-gray-400'}`}>Separados por comas</span>
                                         </div>
                                     )}
 
                                     {qsMode === 'group' && (
                                         <select 
                                             value={qsGroupId} 
-                                            onChange={(e) => setQsGroupId(e.target.value)}
-                                            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+                                            onChange={(e) => {
+                                                setQsGroupId(e.target.value);
+                                                if (qsErrors.group) setQsErrors(prev => ({...prev, group: false}));
+                                            }}
+                                            className={`w-full bg-white border ${qsErrors.group ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 outline-none transition-all`}
                                         >
                                             <option value="">Selecciona un grupo...</option>
                                             {savedGroups.map(g => (
@@ -1150,13 +1170,16 @@
                                 <div className="flex gap-4">
                                     {/* Total Bill Input */}
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Total Boleta (Requerido)</label>
+                                        <label className={`block text-xs font-bold ${qsErrors.total ? 'text-red-500' : 'text-gray-500'} mb-1 uppercase`}>Total Boleta (Requerido)</label>
                                         <div className="relative">
                                             <CurrencyInput 
                                                 value={qsTotal}
-                                                onChange={(val) => setQsTotal(val)}
+                                                onChange={(val) => {
+                                                    setQsTotal(val);
+                                                    if (qsErrors.total) setQsErrors(prev => ({...prev, total: false}));
+                                                }}
                                                 placeholder="$0"
-                                                className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                                className={`w-full text-base border ${qsErrors.total ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-emerald-500'} rounded-lg px-3 py-2 outline-none transition-all`}
                                             />
                                         </div>
                                     </div>
