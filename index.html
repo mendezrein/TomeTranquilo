@@ -259,6 +259,8 @@
             const [qsManualNames, setQsManualNames] = useState(""); // State for manual names
             const [qsSelectedPresets, setQsSelectedPresets] = useState([]);
             const [qsMode, setQsMode] = useState('manual'); // 'count', 'manual', or 'group'
+            const [qsItemsMode, setQsItemsMode] = useState('presets'); // 'presets' or 'manual'
+            const [qsManualItems, setQsManualItems] = useState(""); // State for manual items
             const [qsTotal, setQsTotal] = useState(""); // New state for Total
             const [qsTipPercent, setQsTipPercent] = useState(10); // Tip Percent State
             const [qsErrors, setQsErrors] = useState({}); // New Error State
@@ -546,7 +548,14 @@
                 }
 
                 // 2. Determine Items
-                const initialItems = qsSelectedPresets.map(name => {
+                let itemNames = [];
+                if (qsItemsMode === 'presets') {
+                    itemNames = qsSelectedPresets;
+                } else if (qsItemsMode === 'manual') {
+                    itemNames = qsManualItems.split(',').map(s => s.trim()).filter(s => s !== "");
+                }
+
+                const initialItems = itemNames.map(name => {
                     const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
                     return {
                         id: generateId(),
@@ -558,7 +567,7 @@
                 });
 
                 if (initialItems.length === 0) {
-                    // Add one empty item if nothing selected
+                    // Add one empty item if nothing selected/entered
                     const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
                     initialItems.push({ 
                         id: generateId(), 
@@ -1147,24 +1156,53 @@
                                     )}
                                 </div>
 
-                                {/* Items Presets */}
+                                {/* Items Selection */}
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Agregar Items (Opcional)</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {PRESETS.map(item => (
-                                            <button
-                                                key={item}
-                                                onClick={() => togglePreset(item)}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                                                    qsSelectedPresets.includes(item)
-                                                        ? 'bg-emerald-100 border-emerald-300 text-emerald-800 ring-2 ring-emerald-500 ring-offset-1'
-                                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                }`}
-                                            >
-                                                {item}
-                                            </button>
-                                        ))}
+                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Agregar Items (Opcional)</label>
+                                    <div className="flex gap-2 mb-2">
+                                        <button 
+                                            onClick={() => setQsItemsMode('presets')}
+                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'presets' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                        >
+                                            Predefinidos
+                                        </button>
+                                        <button 
+                                            onClick={() => setQsItemsMode('manual')}
+                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'manual' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                        >
+                                            Manual
+                                        </button>
                                     </div>
+
+                                    {qsItemsMode === 'presets' && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {PRESETS.map(item => (
+                                                <button
+                                                    key={item}
+                                                    onClick={() => togglePreset(item)}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                                                        qsSelectedPresets.includes(item)
+                                                            ? 'bg-emerald-100 border-emerald-300 text-emerald-800 ring-2 ring-emerald-500 ring-offset-1'
+                                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                                >
+                                                    {item}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {qsItemsMode === 'manual' && (
+                                        <div className="relative">
+                                            <textarea
+                                                value={qsManualItems}
+                                                onChange={(e) => setQsManualItems(e.target.value)}
+                                                placeholder="Ej: Pisco, Hielo, Bebidas, Pan..."
+                                                className="w-full bg-white border border-gray-300 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all"
+                                            />
+                                            <span className="text-[10px] text-gray-400 absolute bottom-2 right-2">Separados por comas</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex gap-4">
