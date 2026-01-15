@@ -1,36 +1,36 @@
 <!DOCTYPE html>
-<!--
-                                         /$$                    
-                                        | $$                    
- /$$$$$$/$$$$   /$$$$$$  /$$$$$$$   /$$$$$$$  /$$$$$$  /$$$$$$$$
-| $$_  $$_  $$ /$$__  $$| $$__  $$ /$$__  $$ /$$__  $$|____ /$$/
-| $$ \ $$ \ $$| $$$$$$$$| $$  \ $$| $$  | $$| $$$$$$$$   /$$$$/ 
-| $$ | $$ | $$| $$_____/| $$  | $$| $$  | $$| $$_____/  /$$__/  
-| $$ | $$ | $$|  $$$$$$$| $$  | $$|  $$$$$$$|  $$$$$$$ /$$$$$$$$
-|__/ |__/ |__/ \_______/|__/  |__/ \_______/ \_______/|________/
-                                                                                                                                                                                      
-                     /$$                                        
-                    |__/                                        
-  /$$$$$$   /$$$$$$  /$$ /$$$$$$$                               
- /$$__  $$ /$$__  $$| $$| $$__  $$                              
-| $$  \__/| $$$$$$$$| $$| $$  \ $$                              
-| $$      | $$_____/| $$| $$  | $$                              
-| $$      |  $$$$$$$| $$| $$  | $$                              
-|__/       \_______/|__/|__/  |__/                              
--->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuentas Claras - Tome tranquilo Pariente</title>
-    
+
+    <!--
+                                      /$$                     
+                                     | $$                     
+     /$$$$$$/$$$$   /$$$$$$  /$$$$$$$   /$$$$$$$  /$$$$$$  /$$$$$$$$
+    | $$_  $$_  $$ /$$__  $$| $$__  $$ /$$__  $$ /$$__  $$|____ /$$/
+    | $$ \ $$ \ $$| $$$$$$$$| $$  \ $$| $$  | $$| $$$$$$$$    /$$$$/ 
+    | $$ | $$ | $$| $$_____/| $$  | $$| $$  | $$| $$_____/  /$$__/  
+    | $$ | $$ | $$|  $$$$$$$| $$  | $$|  $$$$$$$|  $$$$$$$ /$$$$$$$$
+    |__/ |__/ |__/ \_______/|__/  |__/ \_______/ \_______/|________/
+                                                                    
+                          /$$                                       
+                         |__/                                       
+       /$$$$$$   /$$$$$$  /$$ /$$$$$$$                              
+      /$$__  $$ /$$__  $$| $$| $$__  $$                             
+     | $$  \__/| $$$$$$$$| $$| $$  \ $$                             
+     | $$      | $$_____/| $$| $$  | $$                             
+     | $$      |  $$$$$$$| $$| $$  | $$                             
+     |__/       \_______/|__/|__/  |__/                             
+    -->
+
     <!-- Open Graph / LinkedIn -->
     <meta property="og:title" content="@mendezrein - Tome Tranquilo">
     <meta property="og:description" content="Cuentas claras...">
     <meta property="og:image" content="https://mendezrein.github.io/TomeTranquilo/tomatranquilo.jpeg">
     <meta property="og:url" content="https://mendezrein.github.io/TomeTranquilo/">
     <meta property="og:type" content="website">
-
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -90,50 +90,6 @@
             CheckCircle2, Share2 
         } from 'lucide-react';
 
-        // --- Gemini API Configuration ---
-        // Se deja vacío para que el entorno o el usuario lo provea si es necesario,
-        // aunque para uso local necesitarías poner tu propia Key aquí si quieres usar la IA.
-        const apiKey = "";
-
-        const fetchGemini = async (prompt, isJson = false, systemInstruction = "") => {
-            if (!apiKey) {
-                alert("Para usar las funciones de IA, necesitas configurar una API Key en el código.");
-                return "Función no disponible sin API Key.";
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemInstruction }] }
-            };
-
-            if (isJson) {
-                payload.generationConfig = {
-                responseMimeType: "application/json"
-                };
-            }
-
-            let delay = 1000;
-            for (let i = 0; i < 5; i++) {
-                try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error('API Error');
-                const result = await response.json();
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                return isJson ? JSON.parse(text) : text;
-                } catch (error) {
-                if (i === 4) throw error;
-                await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2;
-                }
-            }
-        };
-
         // --- Utility Functions ---
 
         const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -174,7 +130,7 @@
             { icon: <Users size={24}/>, title: "Grupos Frecuentes", desc: "¿Sales siempre con los mismos? Guarda tus grupos de amigos, familia o trabajo y cárgalos en un clic." },
             { icon: <Save size={24}/>, title: "Sin Registro", desc: "Todo se guarda localmente en tu navegador o en archivos de texto. Tu privacidad está asegurada." },
             { icon: <CheckCircle2 size={24}/>, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
-            { icon: <FileText size={24}/>, title: "Respaldo Fácil", desc: "Guarda tu cuenta como un archivo y retómala cuando quieras sin perder ningún dato." }
+            { icon: <FileText size={24}/>, title: "Respaldo Fácil", desc: "Guarda y carga cuentas individuales (.txt) o exporta tus grupos para usarlos en otro dispositivo." }
         ];
 
         // --- Initial Data ---
@@ -252,37 +208,40 @@
             // UI States
             const [showHelp, setShowHelp] = useState(false);
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-            const [isAiLoading, setIsAiLoading] = useState(false);
             const [showGroupModal, setShowGroupModal] = useState(false);
             const [newGroupName, setNewGroupName] = useState("");
             const [aiDraftMessage, setAiDraftMessage] = useState("");
             const [expandedPeople, setExpandedPeople] = useState({});
             const [currentTip, setCurrentTip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
             
-            // Welcome Screen State
-            const [showWelcome, setShowWelcome] = useState(() => {
-                // If no data in local storage, show welcome
-                return !localStorage.getItem('cuentas_claras_data');
-            });
+            // Welcome Screen State - Always true on load
+            const [showWelcome, setShowWelcome] = useState(true);
             const [welcomeTitle, setWelcomeTitle] = useState("");
+            
+            // Delete Confirm Modal State
+            const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
             // Ref for file input
             const fileInputRef = useRef(null);
             const welcomeFileInputRef = useRef(null);
+            const groupFileInputRef = useRef(null);
 
             // Derived state for current active bill
             const activeBill = useMemo(() => 
                 bills.find(b => b.id === activeBillId) || bills[0], 
             [bills, activeBillId]);
 
+            // Check if we have saved data (not just the default empty bill)
+            const hasSavedData = useMemo(() => 
+                bills.length > 0 && (bills.length > 1 || bills[0].id !== 'default'), 
+            [bills]);
+
             // --- Effects ---
 
             useEffect(() => {
-                if (!showWelcome) {
                 localStorage.setItem('cuentas_claras_data', JSON.stringify(bills));
                 localStorage.setItem('cuentas_claras_active_id', activeBillId);
-                }
-            }, [bills, activeBillId, showWelcome]);
+            }, [bills, activeBillId]);
 
             useEffect(() => {
                 localStorage.setItem('cuentas_claras_groups', JSON.stringify(savedGroups));
@@ -495,7 +454,16 @@
 
             const handleStartWithTitle = () => {
                 if (!welcomeTitle.trim()) return;
-                updateBill({ name: welcomeTitle }, false); 
+                
+                const isDefaultBill = bills.length === 1 && bills[0].id === 'default' && !bills[0].name;
+
+                if (isDefaultBill) {
+                    updateBill({ name: welcomeTitle }, false);
+                } else {
+                    const newBill = { ...EMPTY_BILL, id: generateId(), name: welcomeTitle };
+                    setBills(prev => [...prev, newBill]);
+                    setActiveBillId(newBill.id);
+                }
                 setShowWelcome(false);
             };
 
@@ -604,23 +572,54 @@
                 if (activeBillId === id) setActiveBillId(newBills[0].id);
             };
 
-            // --- AI Handlers ---
+            const performDeleteAll = () => {
+                setBills([EMPTY_BILL]);
+                setSavedGroups([]);
+                setActiveBillId('default');
+                setHistory([]);
+                setFuture([]);
+                // LocalStorage will be updated by effects automatically
+                setShowDeleteConfirm(false);
+                setShowWelcome(true); // Go back to welcome screen
+            };
 
-            const handleAiDraftMessage = async () => {
-                setIsAiLoading(true);
-                try {
-                const summaryData = activeBill.people.map(p => {
-                    const data = calculatedResults.byPerson[p];
-                    return `${p}: ${formatCurrency(data.total)} (Consumo: ${formatCurrency(data.subtotal)}, Propina: ${formatCurrency(data.tip)})`;
-                }).join('\n');
+            // --- Template Handler ---
+
+            const handleDraftMessage = () => {
+                let message = "🧾 *Va la cuenta:*\n\n";
+
+                activeBill.people.forEach(person => {
+                    const data = calculatedResults.byPerson[person];
+                    // Solo mostrar personas que deben dinero
+                    if (data && data.total > 0) {
+                        // Nombre y Total en Negrita
+                        message += `👤 *${person}: ${formatCurrency(data.total)}*\n`;
+                        
+                        // Subtitulo Desglose en Cursiva
+                        message += `   _Desglose:_\n`;
+                        
+                        data.items.forEach(item => {
+                            const name = item.name || "Item";
+                            let details = "";
+                            if (item.quantity > 1) details += ` x${item.quantity}`;
+                            if (item.isSplit) details += ` (1/${item.splitCount})`;
+                            
+                            // Detalle en Cursiva
+                            message += `   _▫️ ${name}${details}: ${formatCurrency(item.cost)}_\n`;
+                        });
+                        
+                        // Propina en Cursiva si existe
+                        if (data.tip > 0) {
+                            message += `   _🔹 Propina: ${formatCurrency(data.tip)}_\n`;
+                        }
+
+                        message += "\n";
+                    }
+                });
+
+                message += `💰 *Total Final: ${formatCurrency(calculatedResults.billTotal)}*`;
                 
-                const prompt = `Draft a friendly WhatsApp payment reminder message for a group based on these totals:\n${summaryData}\nTotal Bill: ${formatCurrency(calculatedResults.billTotal)}`;
-                
-                const systemInstruction = `You are "El Pariente", a friendly person splitting a bill. Be concise, polite, and use emojis. Mention that people can pay via transfer. IMPORTANT: Keep all monetary values in Chilean Pesos (CLP) exactly as provided (e.g. $10.000), do not convert to USD or change the format.`;
-                
-                const result = await fetchGemini(prompt, false, systemInstruction);
-                setAiDraftMessage(result);
-                } catch (error) { console.error(error); } finally { setIsAiLoading(false); }
+                setAiDraftMessage(message);
             };
 
             // --- File I/O Functions ---
@@ -644,108 +643,263 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
+                setMobileMenuOpen(false);
             };
 
-            const importBillFromFile = (event) => {
+            const exportAllData = () => {
+                const data = {
+                    type: 'full_backup',
+                    timestamp: new Date().toISOString(),
+                    bills: bills,
+                    groups: savedGroups
+                };
+                const jsonString = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonString], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `CuentasClaras_Respaldo_${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setMobileMenuOpen(false);
+            };
+
+            const exportGroupsToFile = () => {
+                const data = {
+                    type: 'groups_backup',
+                    groups: savedGroups
+                };
+                const jsonString = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonString], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `CuentasClaras_Grupos_${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            };
+
+            // --- Handlers for Imports ---
+
+            const handleImportBill = (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
+                reader.onerror = () => {
+                    alert("Error de lectura del navegador.");
+                    event.target.value = '';
+                };
+
                 reader.onload = (e) => {
-                try {
-                    const content = e.target.result;
-                    const parsedData = JSON.parse(content);
+                    try {
+                        const content = e.target.result;
+                        if (!content || content.trim() === "") {
+                            alert("El archivo está vacío.");
+                            return;
+                        }
+                        const parsedData = JSON.parse(content);
 
-                    if (!parsedData.items || !Array.isArray(parsedData.items) || !parsedData.people) {
-                    alert("El archivo no tiene un formato válido de Cuentas Claras.");
-                    return;
+                        // Validate it is a Bill
+                        if (parsedData.items && Array.isArray(parsedData.items) && parsedData.people) {
+                            if (!showWelcome) saveHistory();
+
+                            const newBill = {
+                                ...parsedData,
+                                id: generateId(),
+                                name: parsedData.name + (showWelcome ? "" : " (Importada)"),
+                                items: parsedData.items.map(item => ({
+                                    ...item,
+                                    id: generateId()
+                                }))
+                            };
+
+                            if (showWelcome) {
+                                setBills([newBill]);
+                                setActiveBillId(newBill.id);
+                                setShowWelcome(false);
+                            } else {
+                                setBills(prev => [...prev, newBill]);
+                                setActiveBillId(newBill.id);
+                            }
+                            alert("Cuenta cargada exitosamente!");
+                        } else {
+                            alert("Este archivo no parece ser una Cuenta válida (.txt).\nSi intentas cargar Grupos, usa la opción en el menú de Grupos.");
+                        }
+                    } catch (error) {
+                        console.error("Error parsing file:", error);
+                        alert("Error al procesar el archivo. Asegúrate de que sea un archivo de Cuenta (.txt) válido.");
+                    } finally {
+                         event.target.value = '';
                     }
-
-                    if (!showWelcome) saveHistory();
-
-                    const newBill = {
-                    ...parsedData,
-                    id: generateId(),
-                    name: parsedData.name + (showWelcome ? "" : " (Importada)"),
-                    items: parsedData.items.map(item => ({
-                        ...item,
-                        id: generateId()
-                    }))
-                    };
-
-                    if (showWelcome) {
-                    setBills([newBill]);
-                    setActiveBillId(newBill.id);
-                    setShowWelcome(false);
-                    } else {
-                    setBills(prev => [...prev, newBill]);
-                    setActiveBillId(newBill.id);
-                    }
-                    alert("Cuenta cargada exitosamente!");
-
-                } catch (error) {
-                    console.error("Error parsing file:", error);
-                    alert("Error al leer el archivo.");
-                }
                 };
                 reader.readAsText(file);
-                event.target.value = '';
+            };
+
+            const handleImportGroups = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onerror = () => {
+                    alert("Error de lectura.");
+                    event.target.value = '';
+                };
+
+                reader.onload = (e) => {
+                    try {
+                        const content = e.target.result;
+                        const parsedData = JSON.parse(content);
+
+                        if (parsedData.type === 'groups_backup' || (parsedData.groups && Array.isArray(parsedData.groups) && !parsedData.bills)) {
+                            const newGroups = parsedData.groups || [];
+                            if (newGroups.length === 0) {
+                                alert("El archivo de grupos no contiene datos.");
+                                return;
+                            }
+                            
+                            setSavedGroups(prev => {
+                                const currentIds = new Set(prev.map(g => g.id));
+                                const uniqueNew = newGroups.filter(g => !currentIds.has(g.id));
+                                return [...prev, ...uniqueNew];
+                            });
+                            alert(`Se importaron ${newGroups.length} grupos correctamente.`);
+                        } else {
+                            alert("Este archivo no es un respaldo de Grupos válido.");
+                        }
+                    } catch (error) {
+                        alert("Error al procesar el archivo de grupos.");
+                    } finally {
+                         event.target.value = '';
+                    }
+                };
+                reader.readAsText(file);
             };
 
             if (!activeBill) return null;
 
             return (
                 <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-slate-800 pb-20 sm:pb-4 relative">
+                    
+                    {/* HIDDEN INPUTS AT TOP LEVEL */}
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        onChange={handleImportBill} 
+                        accept=".txt,.json" 
+                        className="hidden" 
+                    />
+                     <input 
+                        type="file" 
+                        ref={welcomeFileInputRef}
+                        onChange={handleImportBill} 
+                        accept=".txt,.json" 
+                        className="hidden" 
+                    />
+                    <input 
+                        type="file" 
+                        ref={groupFileInputRef}
+                        onChange={handleImportGroups} 
+                        accept=".txt,.json" 
+                        className="hidden" 
+                    />
                 
                 {/* --- WELCOME MODAL OVERLAY --- */}
                 {showWelcome && (
                     <div className="fixed inset-0 z-[100] bg-emerald-900/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-                        <div className="bg-emerald-600 p-8 text-center text-white">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto">
+                        <div className="bg-emerald-600 p-8 text-center text-white sticky top-0 z-10">
                         <Calculator className="w-16 h-16 mx-auto mb-4 text-emerald-100" />
                         <h1 className="text-3xl font-bold mb-2">Tome tranquilo Pariente</h1>
                         <p className="text-emerald-100">Divide gastos fácil y rápido.</p>
                         </div>
                         <div className="p-8 space-y-6">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Dale un nombre a la cuenta:</label>
-                            <input 
-                            type="text" 
-                            value={welcomeTitle}
-                            onChange={(e) => setWelcomeTitle(e.target.value)}
-                            placeholder="Ej: Asado Viernes, Almuerzo Oficina..."
-                            className="w-full text-lg border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-0 outline-none transition-all"
-                            autoFocus
-                            onKeyDown={(e) => e.key === 'Enter' && handleStartWithTitle()}
-                            />
-                        </div>
                         
-                        <button 
-                            onClick={handleStartWithTitle}
-                            disabled={!welcomeTitle.trim()}
-                            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
-                        >
-                            Comenzar <ArrowRight size={20} />
-                        </button>
+                        {/* CONTINUE WITH LAST BILL SECTION */}
+                        {hasSavedData && (
+                            <div className="mb-6 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                                <h3 className="text-emerald-800 font-bold mb-3 text-xs uppercase tracking-wide">Continuar donde quedaste</h3>
+                                <button 
+                                onClick={() => setShowWelcome(false)}
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg mb-3 transition-colors shadow-md flex items-center justify-between px-4"
+                                >
+                                <div className="flex flex-col items-start text-left overflow-hidden mr-2">
+                                    <span className="text-xs font-normal opacity-90">Continuar con la última cuenta:</span>
+                                    <span className="truncate w-full text-lg">{activeBill.name || "Cuenta sin nombre"}</span>
+                                </div>
+                                <ArrowRight size={24} className="flex-shrink-0" />
+                                </button>
+                                
+                                {bills.length > 1 && (
+                                    <div className="relative">
+                                        <select 
+                                            onChange={(e) => setActiveBillId(e.target.value)}
+                                            value={activeBillId}
+                                            className="w-full bg-white text-emerald-900 border border-emerald-200 rounded-lg py-2 pl-3 pr-10 outline-none focus:ring-2 focus:ring-emerald-400 appearance-none text-sm cursor-pointer shadow-sm"
+                                        >
+                                            {bills.map(b => (
+                                                <option key={b.id} value={b.id}>
+                                                    {b.name || "Sin nombre"} ({b.date})
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-2.5 text-emerald-400 pointer-events-none" size={16}/>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
+                        {/* NEW BILL SECTION */}
+                        <div>
+                            {hasSavedData && (
+                                <div className="relative flex py-2 items-center mb-4">
+                                    <div className="flex-grow border-t border-gray-300"></div>
+                                    <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">O crea una nueva</span>
+                                    <div className="flex-grow border-t border-gray-300"></div>
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    {hasSavedData ? "Nombre de la nueva cuenta:" : "Dale un nombre a la cuenta:"}
+                                </label>
+                                <input 
+                                type="text" 
+                                value={welcomeTitle}
+                                onChange={(e) => setWelcomeTitle(e.target.value)}
+                                placeholder="Ej: Asado Viernes, Almuerzo Oficina..."
+                                className="w-full text-lg border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-0 outline-none transition-all"
+                                autoFocus={!hasSavedData}
+                                onKeyDown={(e) => e.key === 'Enter' && handleStartWithTitle()}
+                                />
+                            </div>
+                            
+                            <button 
+                                onClick={handleStartWithTitle}
+                                disabled={!welcomeTitle.trim()}
+                                className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                            >
+                                {hasSavedData ? "Crear Nueva" : "Comenzar"} <Plus size={20} />
+                            </button>
+                        </div>
+
+                        {/* IMPORT SECTION */}
                         <div className="relative flex py-2 items-center">
                             <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">O carga una cuenta anterior</span>
+                            <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">O carga una cuenta guardada</span>
                             <div className="flex-grow border-t border-gray-300"></div>
                         </div>
 
-                        <input 
-                            type="file" 
-                            ref={welcomeFileInputRef}
-                            onChange={importBillFromFile} 
-                            accept=".txt" 
-                            className="hidden" 
-                        />
+                        {/* Button triggers the hidden input at top of app */}
                         <button 
                             onClick={() => welcomeFileInputRef.current.click()}
                             className="w-full bg-white border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                         >
-                            <Upload size={20} /> Cargar Archivo .txt
+                            <Upload size={20} /> Cargar Cuenta (.txt)
                         </button>
                         </div>
                     </div>
@@ -757,10 +911,11 @@
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <Calculator className="h-6 w-6" />
-                        <h1 className="text-xl font-bold tracking-tight">Tome tranquilo Pariente</h1>
+                        <h1 className="text-xl font-bold tracking-tight hidden sm:block">Tome tranquilo Pariente</h1>
+                        <h1 className="text-xl font-bold tracking-tight sm:hidden">Cuentas Claras</h1>
                     </div>
                     
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                         <div className="flex bg-emerald-800/50 rounded-lg p-1 space-x-1">
                         <button 
                             onClick={handleUndo}
@@ -780,38 +935,37 @@
                         </button>
                         </div>
 
-                        <button 
-                        onClick={() => setShowHelp(!showHelp)}
-                        className="p-2 hover:bg-emerald-600 rounded-full transition-colors hidden sm:block"
-                        title="Instrucciones Detalladas"
-                        >
-                        <HelpCircle size={20} />
-                        </button>
                         <div className="relative group">
                         <button 
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="flex items-center space-x-2 bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-md transition-colors text-sm"
+                            className="flex items-center space-x-2 bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-md transition-colors text-sm border border-emerald-700"
                         >
                             <FileText size={16} />
-                            <span className="truncate max-w-[100px]">{activeBill.name}</span>
+                            <span className="truncate max-w-[80px] sm:max-w-[120px]">Mis Cuentas</span>
                             <ChevronRight size={16} className={`transform transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`} />
                         </button>
                         
                         {mobileMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 text-gray-800 p-2">
-                            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Mis Cuentas</div>
-                            <div className="max-h-60 overflow-y-auto space-y-1">
+                            <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 text-gray-800 p-2 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex justify-between items-center">
+                                <span>Seleccionar Cuenta</span>
+                                <span className="text-[10px] bg-gray-100 px-1 rounded">{bills.length} activas</span>
+                            </div>
+                            <div className="max-h-60 overflow-y-auto space-y-1 mb-2 custom-scrollbar">
                                 {bills.map(bill => (
                                 <div 
                                     key={bill.id} 
                                     onClick={() => { setActiveBillId(bill.id); setMobileMenuOpen(false); }}
-                                    className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${activeBillId === bill.id ? 'bg-emerald-100 text-emerald-800 font-medium' : 'hover:bg-gray-100'}`}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm group ${activeBillId === bill.id ? 'bg-emerald-100 text-emerald-800 font-medium' : 'hover:bg-gray-100'}`}
                                 >
-                                    <span className="truncate">{bill.name}</span>
+                                    <div className="flex flex-col overflow-hidden">
+                                        <span className="truncate">{bill.name || "Sin nombre"}</span>
+                                        <span className="text-[10px] text-gray-400">{bill.date} • {bill.people.length} p.</span>
+                                    </div>
                                     {bills.length > 1 && (
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); deleteBill(bill.id); }}
-                                        className="text-gray-400 hover:text-red-500 p-1"
+                                        className="text-gray-300 group-hover:text-red-500 p-1 hover:bg-red-50 rounded"
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -819,13 +973,21 @@
                                 </div>
                                 ))}
                             </div>
-                            <div className="border-t mt-2 pt-2">
+                            <div className="border-t border-gray-100 pt-2 space-y-2">
                                 <button 
                                 onClick={createNewBill}
-                                className="w-full flex items-center justify-center space-x-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors"
+                                className="w-full flex items-center justify-center space-x-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors font-medium"
                                 >
                                 <Plus size={16} />
                                 <span>Nueva Cuenta</span>
+                                </button>
+                                
+                                <button 
+                                    onClick={() => { setMobileMenuOpen(false); setShowDeleteConfirm(true); }}
+                                    className="w-full flex items-center justify-center space-x-2 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-md transition-colors border border-red-100 mt-2"
+                                >
+                                    <Trash2 size={14} />
+                                    <span>Borrar Todos los Datos</span>
                                 </button>
                             </div>
                             </div>
@@ -834,6 +996,38 @@
                     </div>
                     </div>
                 </header>
+
+                {/* --- DELETE CONFIRMATION MODAL --- */}
+                {showDeleteConfirm && (
+                    <div className="fixed inset-0 bg-red-900/30 backdrop-blur-sm z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-red-100">
+                            <div className="bg-red-50 p-6 text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <AlertCircle className="text-red-600" size={24} />
+                                </div>
+                                <h3 className="text-lg font-bold text-red-900 mb-2">¿Borrar todos los datos?</h3>
+                                <p className="text-sm text-red-700">
+                                    Esta acción eliminará <strong>todas</strong> tus cuentas y grupos guardados. Esta acción no se puede deshacer.
+                                </p>
+                            </div>
+                            <div className="p-4 space-y-3">
+                                <button 
+                                    onClick={performDeleteAll}
+                                    className="w-full bg-red-600 text-white hover:bg-red-700 font-bold py-3 rounded-xl transition-all shadow-sm"
+                                >
+                                    Sí, Borrar Todo
+                                </button>
+                                
+                                <button 
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* --- INSTRUCTION BAR --- */}
                 <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-3">
@@ -1129,15 +1323,7 @@
                                     <Plus size={18} /> Agregar Fila
                                     </button>
                                     
-                                    {/* Hidden file input for import */}
-                                    <input 
-                                    type="file" 
-                                    ref={fileInputRef}
-                                    onChange={importBillFromFile} 
-                                    accept=".txt" 
-                                    className="hidden" 
-                                    />
-                                    
+                                    {/* Footer Import Button - triggers hidden input */}
                                     <button 
                                     onClick={() => fileInputRef.current.click()}
                                     className="flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100 transition-all"
@@ -1252,12 +1438,12 @@
                         )}
 
                         <button 
-                            onClick={handleAiDraftMessage}
-                            disabled={isAiLoading || activeBill.items.length === 0}
+                            onClick={handleDraftMessage}
+                            disabled={activeBill.items.length === 0}
                             className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50"
                         >
-                            {isAiLoading ? <Loader2 size={18} className="animate-spin" /> : <MessageSquare size={18} />}
-                            Cobrar por WhatsApp ✨
+                             <MessageSquare size={18} />
+                            Resumen WhatsApp
                         </button>
                         </div>
                     </div>
@@ -1283,12 +1469,12 @@
                     </div>
                 </footer>
 
-                {/* --- AI DRAFT MESSAGE MODAL --- */}
+                {/* --- DRAFT MESSAGE MODAL --- */}
                 {aiDraftMessage && (
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
                         <div className="bg-emerald-600 p-4 text-white flex justify-between items-center">
-                        <span className="font-bold flex items-center gap-2"><MessageSquare size={18}/> Borrador Generado ✨</span>
+                        <span className="font-bold flex items-center gap-2"><MessageSquare size={18}/> Resumen para Copiar</span>
                         <button onClick={() => setAiDraftMessage("")} className="hover:bg-emerald-700 p-1 rounded"><X size={20}/></button>
                         </div>
                         <div className="p-6">
@@ -1341,6 +1527,22 @@
                             <p className="text-xs text-indigo-400 mt-2">
                             Se guardarán: {activeBill.people.join(", ")}
                             </p>
+                        </div>
+
+                        {/* Export/Import Groups Buttons */}
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => groupFileInputRef.current.click()}
+                                className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                            >
+                                <Upload size={16} /> Importar Grupos
+                            </button>
+                            <button 
+                                onClick={exportGroupsToFile}
+                                className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                            >
+                                <Download size={16} /> Exportar Grupos
+                            </button>
                         </div>
 
                         {/* Saved Groups List */}
