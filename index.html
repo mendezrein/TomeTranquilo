@@ -138,7 +138,7 @@
 
         // --- Components ---
 
-        const PriceInput = ({ value, onChange }) => {
+        const CurrencyInput = ({ value, onChange, className, placeholder = "$0" }) => {
             const [isFocused, setIsFocused] = useState(false);
             
             // Format only when not focused
@@ -151,7 +151,7 @@
                     type="text"
                     inputMode="numeric"
                     value={displayValue}
-                    placeholder="$0"
+                    placeholder={placeholder}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     onChange={(e) => {
@@ -159,7 +159,7 @@
                         const rawVal = e.target.value.replace(/\D/g, '');
                         onChange(rawVal === '' ? 0 : parseInt(rawVal, 10));
                     }}
-                    className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
+                    className={className}
                 />
             );
         };
@@ -254,6 +254,7 @@
             const [qsGroupId, setQsGroupId] = useState("");
             const [qsSelectedPresets, setQsSelectedPresets] = useState([]);
             const [qsMode, setQsMode] = useState('count'); // 'count' or 'group'
+            const [qsTotal, setQsTotal] = useState(""); // New state for Total
 
             // Delete Confirm Modal State
             const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -531,13 +532,22 @@
                 const name = welcomeTitle.trim() || `Cuenta ${new Date().toLocaleDateString('es-CL').slice(0, 5)}`;
                 
                 const isDefaultBill = bills.length === 1 && bills[0].id === 'default' && !bills[0].name;
+                
+                // Parse qsTotal if it is a string from the input, or number
+                let verifTotal = 0;
+                if (typeof qsTotal === 'string') {
+                    verifTotal = parseInt(qsTotal.replace(/\D/g, '')) || 0;
+                } else {
+                    verifTotal = qsTotal || 0;
+                }
+
                 const newBillData = {
                     name,
                     people,
                     items: initialItems,
                     date: new Date().toISOString().split('T')[0],
                     tipPercent: 10,
-                    verificationTotal: ''
+                    verificationTotal: verifTotal
                 };
 
                 if (isDefaultBill) {
@@ -552,6 +562,7 @@
                 setShowWelcome(false);
                 setWelcomeTitle("");
                 setQsSelectedPresets([]);
+                setQsTotal(""); // Reset total
             };
 
             const togglePreset = (item) => {
@@ -1015,6 +1026,19 @@
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Total Bill Input */}
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">4. Total Boleta (Opcional)</label>
+                                    <div className="relative">
+                                        <CurrencyInput 
+                                            value={qsTotal}
+                                            onChange={(val) => setQsTotal(val)}
+                                            placeholder="$0"
+                                            className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             
                             <button 
@@ -1332,9 +1356,10 @@
                                     />
                                     </td>
                                     <td className="p-2">
-                                    <PriceInput 
+                                    <CurrencyInput 
                                         value={item.price} 
                                         onChange={(val) => updateItem(item.id, 'price', val)} 
+                                        className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
                                     />
                                     </td>
                                     <td className="p-2 text-center border-l border-r border-gray-100 min-w-[120px]">
@@ -1561,18 +1586,16 @@
                         <div>
                             <label className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Verificar con Boleta</label>
                             <div className="relative">
-                            <span className="absolute left-2 top-1.5 text-slate-500 font-bold">$</span>
-                            <input 
-                                type="number"
-                                placeholder="Total Boleta..."
+                            <CurrencyInput 
                                 value={activeBill.verificationTotal}
-                                onChange={(e) => updateBill({ verificationTotal: e.target.value })}
-                                className={`w-full bg-slate-700 text-white rounded px-3 pl-6 py-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-right ${calculatedResults.isMismatch ? 'ring-2 ring-red-500' : ''}`}
+                                onChange={(val) => updateBill({ verificationTotal: val })}
+                                placeholder="$ Total Boleta"
+                                className={`w-full bg-slate-700 text-white rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-right ${calculatedResults.isMismatch ? 'ring-2 ring-red-500' : ''}`}
                             />
                             </div>
                         </div>
 
-                        {activeBill.verificationTotal && (
+                        {activeBill.verificationTotal > 0 && (
                             <div className={`text-center text-sm font-bold p-2 rounded flex justify-between items-center ${calculatedResults.isMismatch ? 'bg-red-900/50 text-red-300' : 'bg-emerald-900/50 text-emerald-300'}`}>
                             <span>{calculatedResults.isMismatch ? 'Faltan/Sobran:' : '¡Cuadra!'}</span>
                             <span>{formatCurrency(Math.abs(calculatedResults.difference))}</span>
