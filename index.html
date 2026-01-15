@@ -696,7 +696,16 @@
             };
 
             const deleteBill = (id) => {
-                if (bills.length === 1) return;
+                if (bills.length === 1) {
+                    // If deleting the last bill, reset to empty and show welcome screen
+                    saveHistory();
+                    setBills([EMPTY_BILL]);
+                    setActiveBillId('default');
+                    setShowWelcome(true);
+                    setMobileMenuOpen(false);
+                    return;
+                }
+
                 saveHistory(); 
                 const newBills = bills.filter(b => b.id !== id);
                 setBills(newBills);
@@ -900,7 +909,7 @@
                                 setBills(prev => [...prev, newBill]);
                                 setActiveBillId(newBill.id);
                             }
-                            alert("Cuenta cargada exitosamente!");
+                            // Success alert removed as requested
                         } else {
                             alert("Este archivo no parece ser una Cuenta válida (.txt).\nSi intentas cargar Grupos, usa la opción en el menú de Grupos.");
                         }
@@ -1261,14 +1270,12 @@
                                         <span className="truncate">{bill.name || "Sin nombre"}</span>
                                         <span className="text-[10px] text-gray-400">{bill.date} • {bill.people.length} p.</span>
                                     </div>
-                                    {bills.length > 1 && (
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); deleteBill(bill.id); }}
                                         className="text-gray-300 group-hover:text-red-500 p-1 hover:bg-red-50 rounded"
                                     >
                                         <Trash2 size={14} />
                                     </button>
-                                    )}
                                 </div>
                                 ))}
                             </div>
