@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuentas Claras - Tome tranquilo Pariente-@mendezrein</title>
+    <title>Tome tranquilo Pariente-@mendezrein</title>
     <!-- Updated Favicon to embedded SVG (Excel Green Style) for reliability -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='10' fill='%23217346'/%3E%3Cpath d='M20 20 L28 32 L20 44 L28 44 L32 36 L36 44 L44 44 L36 32 L44 20 L36 20 L32 28 L28 20 Z' fill='white' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='10' fill='%23217346'/%3E%3Cpath d='M20 20 L28 32 L20 44 L28 44 L32 36 L36 44 L44 44 L36 32 L44 20 L36 20 L32 28 L28 20 Z' fill='white' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
 
     <!--
                                       /$$                     
@@ -33,13 +35,13 @@
     <meta property="og:image" content="https://mendezrein.github.io/TomeTranquilo/tomatranquilo.jpeg">
     <meta property="og:url" content="https://mendezrein.github.io/TomeTranquilo/">
     <meta property="og:type" content="website">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Babel para procesar JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+
     <!-- Html2Canvas for Image Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -59,40 +61,51 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.1);
             border-radius: 4px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(16, 185, 129, 0.5); /* Emerald 500 with opacity */
+            background: rgba(16, 185, 129, 0.5);
+            /* Emerald 500 with opacity */
             border-radius: 4px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(16, 185, 129, 0.8);
         }
-        
+
         /* Animaciones suaves */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
+
         .animate-in {
             animation: fadeIn 0.3s ease-out forwards;
         }
     </style>
 </head>
+
 <body class="bg-gray-50 text-slate-800 font-sans">
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
-        import { 
-            Plus, Minus, Trash2, DollarSign, FileText, X, ChevronRight, 
-            ChevronDown, ChevronUp, Calculator, HelpCircle, AlertCircle, 
-            Info, MessageSquare, Clipboard, Loader2, Undo, Redo, Copy, 
-            Download, Upload, Save, ArrowRight, Users, Calendar, 
-            CheckCircle2, Share2, Image as ImageIcon 
+        import {
+            Plus, Minus, Trash2, DollarSign, FileText, X, ChevronRight,
+            ChevronDown, ChevronUp, Calculator, HelpCircle, AlertCircle,
+            Info, MessageSquare, Clipboard, Loader2, Undo, Redo, Copy,
+            Download, Upload, Save, ArrowRight, Users, Calendar,
+            CheckCircle2, Share2, Image as ImageIcon
         } from 'lucide-react';
 
         // --- Utility Functions ---
@@ -100,8 +113,8 @@
         const generateId = () => Math.random().toString(36).substr(2, 9);
 
         const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('es-CL', { 
-                style: 'currency', 
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
                 currency: 'CLP',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
@@ -132,26 +145,26 @@
         const PRESETS = ["Cerveza 🍺", "Hamburguesa 🍔", "Papas 🍟", "Pizza 🍕", "Tragos 🍹", "Bebidas 🥤", "Carnes 🥩"];
 
         const FEATURES = [
-            { icon: <Calculator size={24}/>, title: "División Flexible", desc: "Divide items por unidad (quién comió cuántos) o compártelos equitativamente entre varios (ej: una pizza entre 4)." },
-            { icon: <MessageSquare size={24}/>, title: "Cobro por WhatsApp", desc: "Genera un mensaje cordial con el resumen exacto por persona, listo para copiar y enviar al grupo." },
-            { icon: <Users size={24}/>, title: "Grupos Frecuentes", desc: "¿Sales siempre con los mismos? Guarda tus grupos de amigos, familia o trabajo y cárgalos en un clic." },
-            { icon: <Save size={24}/>, title: "Sin Registro", desc: "Todo se guarda localmente en tu navegador o en archivos de texto. Tu privacidad está asegurada." },
-            { icon: <CheckCircle2 size={24}/>, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
-            { icon: <FileText size={24}/>, title: "Respaldo Fácil", desc: "Guarda y carga cuentas individuales (.txt) o exporta tus grupos para usarlos en otro dispositivo." }
+            { icon: <Calculator size={24} />, title: "División Flexible", desc: "Divide items por unidad (quién comió cuántos) o compártelos equitativamente entre varios (ej: una pizza entre 4)." },
+            { icon: <MessageSquare size={24} />, title: "Cobro por WhatsApp", desc: "Genera un mensaje cordial con el resumen exacto por persona, listo para copiar y enviar al grupo." },
+            { icon: <Users size={24} />, title: "Grupos Frecuentes", desc: "¿Sales siempre con los mismos? Guarda tus grupos de amigos, familia o trabajo y cárgalos en un clic." },
+            { icon: <Save size={24} />, title: "Sin Registro", desc: "Todo se guarda localmente en tu navegador o en archivos de texto. Tu privacidad está asegurada." },
+            { icon: <CheckCircle2 size={24} />, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
+            { icon: <FileText size={24} />, title: "Respaldo Fácil", desc: "Guarda y carga cuentas individuales (.txt) o exporta tus grupos para usarlos en otro dispositivo." }
         ];
 
         // --- Components ---
 
         const CurrencyInput = ({ value, onChange, className, placeholder = "$0" }) => {
             const [isFocused, setIsFocused] = useState(false);
-            
+
             // Format only when not focused
-            const displayValue = isFocused 
+            const displayValue = isFocused
                 ? (value === 0 ? '' : value)
                 : (value === 0 ? '' : formatCurrency(value));
 
             return (
-                <input 
+                <input
                     type="text"
                     inputMode="numeric"
                     value={displayValue}
@@ -172,55 +185,55 @@
 
         const EMPTY_BILL = {
             id: 'default',
-            name: '', 
+            name: '',
             date: new Date().toISOString().split('T')[0],
             people: ['Persona A', 'Persona B'],
             items: [
-                { 
-                id: '1', 
-                name: 'Item Ejemplo', 
-                price: 10000, 
-                splitCount: 1, 
-                shares: { 'Persona A': 1, 'Persona B': 0 } 
+                {
+                    id: '1',
+                    name: 'Item Ejemplo',
+                    price: 10000,
+                    splitCount: 1,
+                    shares: { 'Persona A': 1, 'Persona B': 0 }
                 }
             ],
             tipPercent: 10,
-            verificationTotal: '' 
+            verificationTotal: ''
         };
 
         function App() {
             // --- State ---
             const [bills, setBills] = useState(() => {
                 try {
-                const saved = localStorage.getItem('cuentas_claras_data');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                    return parsed.map(bill => ({
-                        ...bill,
-                        verificationTotal: bill.verificationTotal !== undefined ? bill.verificationTotal : '',
-                        items: bill.items.map(item => ({
-                        ...item,
-                        splitCount: item.splitCount || 1, 
-                        shares: Object.keys(item.shares).reduce((acc, key) => {
-                            const val = item.shares[key];
-                            if (typeof val === 'boolean') {
-                                acc[key] = val ? 1 : 0;
-                            } else {
-                                acc[key] = parseFloat(val) || 0;
-                            }
-                            return acc;
-                        }, {})
-                        }))
-                    }));
+                    const saved = localStorage.getItem('cuentas_claras_data');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            return parsed.map(bill => ({
+                                ...bill,
+                                verificationTotal: bill.verificationTotal !== undefined ? bill.verificationTotal : '',
+                                items: bill.items.map(item => ({
+                                    ...item,
+                                    splitCount: item.splitCount || 1,
+                                    shares: Object.keys(item.shares).reduce((acc, key) => {
+                                        const val = item.shares[key];
+                                        if (typeof val === 'boolean') {
+                                            acc[key] = val ? 1 : 0;
+                                        } else {
+                                            acc[key] = parseFloat(val) || 0;
+                                        }
+                                        return acc;
+                                    }, {})
+                                }))
+                            }));
+                        }
                     }
-                }
                 } catch (e) {
-                console.error("Failed to load bills", e);
+                    console.error("Failed to load bills", e);
                 }
                 return [EMPTY_BILL];
             });
-            
+
             const [activeBillId, setActiveBillId] = useState(() => {
                 const savedId = localStorage.getItem('cuentas_claras_active_id');
                 return savedId || bills[0]?.id || 'default';
@@ -229,10 +242,10 @@
             // Saved Groups State
             const [savedGroups, setSavedGroups] = useState(() => {
                 try {
-                const saved = localStorage.getItem('cuentas_claras_groups');
-                return saved ? JSON.parse(saved) : [];
+                    const saved = localStorage.getItem('cuentas_claras_groups');
+                    return saved ? JSON.parse(saved) : [];
                 } catch (e) {
-                return [];
+                    return [];
                 }
             });
 
@@ -248,11 +261,11 @@
             const [aiDraftMessage, setAiDraftMessage] = useState("");
             const [expandedPeople, setExpandedPeople] = useState({});
             const [currentTip, setCurrentTip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
-            
+
             // Welcome Screen State - Always true on load
             const [showWelcome, setShowWelcome] = useState(true);
             const [welcomeTitle, setWelcomeTitle] = useState("");
-            
+
             // Quick Start State
             const [qsPeopleCount, setQsPeopleCount] = useState(2);
             const [qsGroupId, setQsGroupId] = useState("");
@@ -275,19 +288,19 @@
             const fileInputRef = useRef(null);
             const welcomeFileInputRef = useRef(null);
             const groupFileInputRef = useRef(null);
-            
+
             // Ref for Summary Panel Image Export
             const summaryRef = useRef(null);
 
             // Derived state for current active bill
-            const activeBill = useMemo(() => 
-                bills.find(b => b.id === activeBillId) || bills[0], 
-            [bills, activeBillId]);
+            const activeBill = useMemo(() =>
+                bills.find(b => b.id === activeBillId) || bills[0],
+                [bills, activeBillId]);
 
             // Check if we have saved data (not just the default empty bill)
-            const hasSavedData = useMemo(() => 
-                bills.length > 0 && (bills.length > 1 || bills[0].id !== 'default'), 
-            [bills]);
+            const hasSavedData = useMemo(() =>
+                bills.length > 0 && (bills.length > 1 || bills[0].id !== 'default'),
+                [bills]);
 
             // --- Effects ---
 
@@ -303,77 +316,77 @@
             // --- Logic / Calculations ---
 
             const calculatedResults = useMemo(() => {
-                if (!activeBill) return { 
-                byPerson: {}, billSubtotal: 0, billTotal: 0, totalTip: 0, unallocatedTotal: 0, difference: 0, isMismatch: false 
+                if (!activeBill) return {
+                    byPerson: {}, billSubtotal: 0, billTotal: 0, totalTip: 0, unallocatedTotal: 0, difference: 0, isMismatch: false
                 };
 
                 const totals = {};
                 const subtotalByPerson = {};
                 const detailsByPerson = {};
-                
+
                 activeBill.people.forEach(p => {
-                totals[p] = 0;
-                subtotalByPerson[p] = 0;
-                detailsByPerson[p] = [];
+                    totals[p] = 0;
+                    subtotalByPerson[p] = 0;
+                    detailsByPerson[p] = [];
                 });
 
                 let billSubtotal = 0;
                 let unallocatedTotal = 0;
 
                 activeBill.items.forEach(item => {
-                const price = parseFloat(item.price) || 0;
-                
-                let totalShares = 0;
-                activeBill.people.forEach(p => {
-                    let qty = parseFloat(item.shares[p]) || 0;
-                    let splitCount = parseInt(item.splitCount);
-                    if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
-                    if (splitCount > 1 && qty > 0) qty = 1; 
-                    totalShares += qty;
-                });
+                    const price = parseFloat(item.price) || 0;
 
-                let targetSplit = parseInt(item.splitCount);
-                if (isNaN(targetSplit) || targetSplit < 1) targetSplit = 1;
-
-                let lineTotal = 0;
-                let costPerUnit = 0;
-
-                if (targetSplit === 1) {
-                    // Mode 1: Unit Price (Price is per unit/person)
-                    costPerUnit = price;
-                    lineTotal = price * totalShares;
-                } else {
-                    // Mode 2: Fixed Split (Price is Total, Split by Fixed N)
-                    costPerUnit = price / targetSplit;
-                    lineTotal = costPerUnit * totalShares; 
-                    unallocatedTotal += (price - lineTotal);
-                }
-
-                if (targetSplit === 1) {
-                    billSubtotal += lineTotal;
-                } else {
-                    billSubtotal += price; 
-                }
-
-                if (costPerUnit > 0) {
+                    let totalShares = 0;
                     activeBill.people.forEach(p => {
-                        let quantity = parseFloat(item.shares[p]) || 0;
-                        if (targetSplit > 1 && quantity > 0) quantity = 1;
-
-                        if (quantity > 0) {
-                            const itemCost = costPerUnit * quantity;
-                            subtotalByPerson[p] += itemCost;
-                            
-                            detailsByPerson[p].push({
-                            name: item.name,
-                            quantity: quantity,
-                            cost: itemCost,
-                            isSplit: targetSplit > 1,
-                            splitCount: targetSplit
-                            });
-                        }
+                        let qty = parseFloat(item.shares[p]) || 0;
+                        let splitCount = parseInt(item.splitCount);
+                        if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+                        if (splitCount > 1 && qty > 0) qty = 1;
+                        totalShares += qty;
                     });
-                }
+
+                    let targetSplit = parseInt(item.splitCount);
+                    if (isNaN(targetSplit) || targetSplit < 1) targetSplit = 1;
+
+                    let lineTotal = 0;
+                    let costPerUnit = 0;
+
+                    if (targetSplit === 1) {
+                        // Mode 1: Unit Price (Price is per unit/person)
+                        costPerUnit = price;
+                        lineTotal = price * totalShares;
+                    } else {
+                        // Mode 2: Fixed Split (Price is Total, Split by Fixed N)
+                        costPerUnit = price / targetSplit;
+                        lineTotal = costPerUnit * totalShares;
+                        unallocatedTotal += (price - lineTotal);
+                    }
+
+                    if (targetSplit === 1) {
+                        billSubtotal += lineTotal;
+                    } else {
+                        billSubtotal += price;
+                    }
+
+                    if (costPerUnit > 0) {
+                        activeBill.people.forEach(p => {
+                            let quantity = parseFloat(item.shares[p]) || 0;
+                            if (targetSplit > 1 && quantity > 0) quantity = 1;
+
+                            if (quantity > 0) {
+                                const itemCost = costPerUnit * quantity;
+                                subtotalByPerson[p] += itemCost;
+
+                                detailsByPerson[p].push({
+                                    name: item.name,
+                                    quantity: quantity,
+                                    cost: itemCost,
+                                    isSplit: targetSplit > 1,
+                                    splitCount: targetSplit
+                                });
+                            }
+                        });
+                    }
                 });
 
                 const tipMultiplier = activeBill.tipPercent / 100;
@@ -381,30 +394,30 @@
                 let totalTip = 0;
 
                 activeBill.people.forEach(p => {
-                const sub = subtotalByPerson[p];
-                const tip = sub * tipMultiplier;
-                totals[p] = {
-                    subtotal: sub,
-                    tip: tip,
-                    total: sub + tip,
-                    items: detailsByPerson[p]
-                };
-                totalBill += (sub + tip);
-                totalTip += tip;
+                    const sub = subtotalByPerson[p];
+                    const tip = sub * tipMultiplier;
+                    totals[p] = {
+                        subtotal: sub,
+                        tip: tip,
+                        total: sub + tip,
+                        items: detailsByPerson[p]
+                    };
+                    totalBill += (sub + tip);
+                    totalTip += tip;
                 });
 
                 const enteredTotal = parseFloat(activeBill.verificationTotal) || 0;
                 const difference = enteredTotal > 0 ? totalBill - enteredTotal : 0;
                 const isMismatch = enteredTotal > 0 && Math.abs(difference) > 5;
 
-                return { 
-                byPerson: totals, 
-                billSubtotal, 
-                billTotal: totalBill, 
-                totalTip,
-                unallocatedTotal,
-                difference,
-                isMismatch
+                return {
+                    byPerson: totals,
+                    billSubtotal,
+                    billTotal: totalBill,
+                    totalTip,
+                    unallocatedTotal,
+                    difference,
+                    isMismatch
                 };
             }, [activeBill]);
 
@@ -415,7 +428,7 @@
                     const newHistory = [...prev, { bills: JSON.parse(JSON.stringify(bills)), activeBillId }];
                     return newHistory.length > 50 ? newHistory.slice(1) : newHistory;
                 });
-                setFuture([]); 
+                setFuture([]);
             };
 
             const handleUndo = useCallback(() => {
@@ -442,19 +455,19 @@
 
             useEffect(() => {
                 const handleKeyDown = (e) => {
-                const isCmdOrCtrl = e.ctrlKey || e.metaKey;
-                if (isCmdOrCtrl && e.key.toLowerCase() === 'z') {
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                    handleRedo();
-                    } else {
-                    handleUndo();
+                    const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+                    if (isCmdOrCtrl && e.key.toLowerCase() === 'z') {
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            handleRedo();
+                        } else {
+                            handleUndo();
+                        }
                     }
-                }
-                if (isCmdOrCtrl && e.key.toLowerCase() === 'y') {
-                    e.preventDefault();
-                    handleRedo();
-                }
+                    if (isCmdOrCtrl && e.key.toLowerCase() === 'y') {
+                        e.preventDefault();
+                        handleRedo();
+                    }
                 };
                 window.addEventListener('keydown', handleKeyDown);
                 return () => window.removeEventListener('keydown', handleKeyDown);
@@ -465,9 +478,9 @@
             const handleSaveGroup = () => {
                 if (!newGroupName.trim()) return;
                 const newGroup = {
-                id: generateId(),
-                name: newGroupName,
-                people: activeBill.people
+                    id: generateId(),
+                    name: newGroupName,
+                    people: activeBill.people
                 };
                 setSavedGroups(prev => [...prev, newGroup]);
                 setNewGroupName("");
@@ -475,22 +488,22 @@
 
             const handleLoadGroup = (groupPeople) => {
                 if (!groupPeople || groupPeople.length === 0) return;
-                
-                saveHistory(); 
-                
+
+                saveHistory();
+
                 const newItems = activeBill.items.map(item => ({
-                ...item,
-                shares: groupPeople.reduce((acc, p) => ({ 
-                    ...acc, 
-                    [p]: item.shares[p] || 0 
-                }), {})
+                    ...item,
+                    shares: groupPeople.reduce((acc, p) => ({
+                        ...acc,
+                        [p]: item.shares[p] || 0
+                    }), {})
                 }));
 
-                updateBill({ 
-                people: groupPeople,
-                items: newItems
-                }, false); 
-                
+                updateBill({
+                    people: groupPeople,
+                    items: newItems
+                }, false);
+
                 setShowGroupModal(false);
             };
 
@@ -502,7 +515,7 @@
 
             const handleQuickStart = () => {
                 const newErrors = {};
-                
+
                 // Validation for Total Bill
                 let verifTotal = 0;
                 if (typeof qsTotal === 'string') {
@@ -518,7 +531,7 @@
                 // 1. Determine People
                 let people = [];
                 if (qsMode === 'group') {
-                     if (qsGroupId) {
+                    if (qsGroupId) {
                         const group = savedGroups.find(g => g.id === qsGroupId);
                         if (group) people = [...group.people];
                     } else {
@@ -531,16 +544,16 @@
                         newErrors.manualNames = true;
                     }
                 }
-                
+
                 // If we have errors, set them and stop
                 if (Object.keys(newErrors).length > 0) {
                     setQsErrors(newErrors);
                     return;
                 }
-                
+
                 // Clear errors if everything is fine
                 setQsErrors({});
-                
+
                 if (people.length === 0) {
                     // Fallback to count if group is invalid or mode is count
                     const count = Math.max(1, parseInt(qsPeopleCount) || 2);
@@ -548,19 +561,49 @@
                 }
 
                 // 2. Determine Items
-                let itemNames = [];
+                let itemStrings = [];
                 if (qsItemsMode === 'presets') {
-                    itemNames = qsSelectedPresets;
+                    itemStrings = qsSelectedPresets;
                 } else if (qsItemsMode === 'manual') {
-                    itemNames = qsManualItems.split(',').map(s => s.trim()).filter(s => s !== "");
+                    itemStrings = qsManualItems.split(',').map(s => s.trim()).filter(s => s !== "");
                 }
 
-                const initialItems = itemNames.map(name => {
+                const initialItems = itemStrings.map(rawStr => {
                     const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
+
+                    let name = rawStr;
+                    let price = 0;
+
+                    // Smart Parsing for Manual Entry: Quantity:Name:TotalPrice
+                    // Example: "2:Heineken:10000" -> Name: "Heineken", Price: 5000 (Unitary)
+                    const parts = rawStr.split(':').map(p => p.trim());
+                    if (parts.length === 3) {
+                        const qty = parseFloat(parts[0]);
+                        const itemName = parts[1];
+                        const totalCost = parseFloat(parts[2]);
+
+                        // Check if valid numbers
+                        if (!isNaN(qty) && qty > 0 && !isNaN(totalCost)) {
+                            name = itemName;
+                            // Calculate Unit Price because default splitCount is 1 (per unit mode)
+                            price = totalCost / qty;
+                        }
+                    } else if (parts.length === 2) {
+                        // Case: Item:Total (Assume Qty = 1)
+                        const itemName = parts[0];
+                        const totalCost = parseFloat(parts[1]);
+
+                        if (!isNaN(totalCost)) {
+                            name = itemName;
+                            price = totalCost; // Qty is 1, so price is total
+                        }
+                    }
+
+
                     return {
                         id: generateId(),
                         name: name,
-                        price: 0,
+                        price: price,
                         splitCount: 1,
                         shares: shares
                     };
@@ -569,20 +612,20 @@
                 if (initialItems.length === 0) {
                     // Add one empty item if nothing selected/entered
                     const shares = people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {});
-                    initialItems.push({ 
-                        id: generateId(), 
-                        name: '', 
-                        price: 0, 
-                        splitCount: 1, 
-                        shares: shares 
+                    initialItems.push({
+                        id: generateId(),
+                        name: '',
+                        price: 0,
+                        splitCount: 1,
+                        shares: shares
                     });
                 }
 
                 // 3. Create Bill
                 const name = welcomeTitle.trim() || `Cuenta ${new Date().toLocaleDateString('es-CL').slice(0, 5)}`;
-                
+
                 const isDefaultBill = bills.length === 1 && bills[0].id === 'default' && !bills[0].name;
-                
+
                 const newBillData = {
                     name,
                     people,
@@ -599,7 +642,7 @@
                     setBills(prev => [...prev, newBill]);
                     setActiveBillId(newBill.id);
                 }
-                
+
                 saveHistory();
                 setShowWelcome(false);
                 setWelcomeTitle("");
@@ -610,7 +653,7 @@
             };
 
             const togglePreset = (item) => {
-                setQsSelectedPresets(prev => 
+                setQsSelectedPresets(prev =>
                     prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
                 );
             };
@@ -627,24 +670,24 @@
 
             const addPerson = () => {
                 const newName = `Persona ${activeBill.people.length + 1}`;
-                updateBill({ 
+                updateBill({
                     people: [...activeBill.people, newName],
                     items: activeBill.items.map(item => ({
                         ...item,
-                        shares: { ...item.shares, [newName]: 0 } 
+                        shares: { ...item.shares, [newName]: 0 }
                     }))
                 });
             };
 
             const removePerson = (name) => {
                 if (activeBill.people.length <= 1) return;
-                updateBill({ 
-                people: activeBill.people.filter(p => p !== name),
-                items: activeBill.items.map(item => {
-                    const newShares = { ...item.shares };
-                    delete newShares[name];
-                    return { ...item, shares: newShares };
-                })
+                updateBill({
+                    people: activeBill.people.filter(p => p !== name),
+                    items: activeBill.items.map(item => {
+                        const newShares = { ...item.shares };
+                        delete newShares[name];
+                        return { ...item, shares: newShares };
+                    })
                 });
             };
 
@@ -652,12 +695,12 @@
                 if (activeBill.people.includes(newName)) return;
                 const newPeople = activeBill.people.map(p => p === oldName ? newName : p);
                 const newItems = activeBill.items.map(item => {
-                const newShares = { ...item.shares };
-                if (newShares.hasOwnProperty(oldName)) {
-                    newShares[newName] = newShares[oldName];
-                    delete newShares[oldName];
-                }
-                return { ...item, shares: newShares };
+                    const newShares = { ...item.shares };
+                    if (newShares.hasOwnProperty(oldName)) {
+                        newShares[newName] = newShares[oldName];
+                        delete newShares[oldName];
+                    }
+                    return { ...item, shares: newShares };
                 });
                 updateBill({ people: newPeople, items: newItems });
             };
@@ -679,28 +722,28 @@
 
                 const originalItem = activeBill.items[itemIndex];
                 const newItem = {
-                ...originalItem,
-                id: generateId(),
-                shares: activeBill.people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {}) 
+                    ...originalItem,
+                    id: generateId(),
+                    shares: activeBill.people.reduce((acc, p) => ({ ...acc, [p]: 0 }), {})
                 };
 
                 const newItems = [...activeBill.items];
                 newItems.splice(itemIndex + 1, 0, newItem);
-                
+
                 updateBill({ items: newItems });
             };
 
             const updateItemShare = (itemId, person, value) => {
                 const newItems = activeBill.items.map(item => {
-                if (item.id === itemId) {
-                    let val = parseFloat(value);
-                    if (isNaN(val) || val < 0) val = 0;
-                    return { 
-                    ...item, 
-                    shares: { ...item.shares, [person]: val } 
-                    };
-                }
-                return item;
+                    if (item.id === itemId) {
+                        let val = parseFloat(value);
+                        if (isNaN(val) || val < 0) val = 0;
+                        return {
+                            ...item,
+                            shares: { ...item.shares, [person]: val }
+                        };
+                    }
+                    return item;
                 });
                 updateBill({ items: newItems });
             };
@@ -710,7 +753,7 @@
             };
 
             const createNewBill = () => {
-                saveHistory(); 
+                saveHistory();
                 const newBill = { ...EMPTY_BILL, id: generateId(), name: 'Nueva Cuenta' };
                 setBills([...bills, newBill]);
                 setActiveBillId(newBill.id);
@@ -729,7 +772,7 @@
                     return;
                 }
 
-                saveHistory(); 
+                saveHistory();
                 const newBills = bills.filter(b => b.id !== id);
                 setBills(newBills);
                 if (activeBillId === id) setActiveBillId(newBills[0].id);
@@ -757,20 +800,20 @@
                     if (data && data.total > 0) {
                         // Nombre y Total en Negrita
                         message += `👤 *${person}: ${formatCurrency(data.total)}*\n`;
-                        
+
                         // Subtitulo Desglose en Cursiva
                         message += `   _Desglose:_\n`;
-                        
+
                         data.items.forEach(item => {
                             const name = item.name || "Item";
                             let details = "";
                             if (item.quantity > 1) details += ` x${item.quantity}`;
                             if (item.isSplit) details += ` (1/${item.splitCount})`;
-                            
+
                             // Detalle en Cursiva
                             message += `   _▫️ ${name}${details}: ${formatCurrency(item.cost)}_\n`;
                         });
-                        
+
                         // Propina en Cursiva si existe
                         if (data.tip > 0) {
                             message += `   _🔹 Propina: ${formatCurrency(data.tip)}_\n`;
@@ -781,32 +824,32 @@
                 });
 
                 message += `💰 *Total Final: ${formatCurrency(calculatedResults.billTotal)}*`;
-                
+
                 setAiDraftMessage(message);
             };
 
             // --- Image Export Handler ---
             const handleExportImage = async () => {
                 if (!summaryRef.current) return;
-                
+
                 try {
                     const originalElement = summaryRef.current;
                     const clone = originalElement.cloneNode(true);
-                    
+
                     // Set up clone styles for optimal "Receipt" look
                     clone.style.position = 'absolute';
                     clone.style.top = '-9999px'; // Move off-screen
                     clone.style.left = '0';
                     clone.style.width = '450px'; // Fixed width for better readability
-                    clone.style.height = 'auto'; 
+                    clone.style.height = 'auto';
                     clone.style.zIndex = '-9999';
-                    clone.style.backgroundColor = '#1e293b'; 
+                    clone.style.backgroundColor = '#1e293b';
                     clone.style.padding = '20px';
                     clone.style.borderRadius = '12px';
-                    
+
                     // Remove sticky/positioning classes from clone
                     clone.classList.remove('sticky', 'top-24', 'h-fit');
-                    
+
                     // FIX: Handle Truncated Text
                     const truncatedElements = clone.querySelectorAll('.truncate');
                     truncatedElements.forEach(el => {
@@ -824,7 +867,7 @@
                     document.body.appendChild(clone);
 
                     const canvas = await window.html2canvas(clone, {
-                        backgroundColor: '#1e293b', 
+                        backgroundColor: '#1e293b',
                         scale: 2, // High resolution
                         useCORS: true,
                         logging: false
@@ -852,11 +895,11 @@
 
             const exportBillToFile = () => {
                 const dataToSave = {
-                name: activeBill.name,
-                people: activeBill.people,
-                items: activeBill.items,
-                tipPercent: activeBill.tipPercent,
-                verificationTotal: activeBill.verificationTotal
+                    name: activeBill.name,
+                    people: activeBill.people,
+                    items: activeBill.items,
+                    tipPercent: activeBill.tipPercent,
+                    verificationTotal: activeBill.verificationTotal
                 };
 
                 const jsonString = JSON.stringify(dataToSave, null, 2);
@@ -940,7 +983,7 @@
                         console.error("Error parsing file:", error);
                         alert("Error al procesar el archivo. Asegúrate de que sea un archivo de Cuenta (.txt) válido.");
                     } finally {
-                         event.target.value = '';
+                        event.target.value = '';
                     }
                 };
                 reader.readAsText(file);
@@ -967,7 +1010,7 @@
                                 alert("El archivo de grupos no contiene datos.");
                                 return;
                             }
-                            
+
                             setSavedGroups(prev => {
                                 const currentIds = new Set(prev.map(g => g.id));
                                 const uniqueNew = newGroups.filter(g => !currentIds.has(g.id));
@@ -980,7 +1023,7 @@
                     } catch (error) {
                         alert("Error al procesar el archivo de grupos.");
                     } finally {
-                         event.target.value = '';
+                        event.target.value = '';
                     }
                 };
                 reader.readAsText(file);
@@ -989,1055 +1032,1049 @@
             if (!activeBill) return null;
 
             return (
-                <div 
+                <div
                     className="min-h-screen bg-gray-50 flex flex-col font-sans text-slate-800 pb-20 sm:pb-4 relative"
                     onClick={() => setSelectedItemId(null)}
                 >
-                    
+
                     {/* HIDDEN INPUTS AT TOP LEVEL */}
-                    <input 
-                        type="file" 
+                    <input
+                        type="file"
                         ref={fileInputRef}
-                        onChange={handleImportBill} 
-                        accept=".txt,.json" 
-                        className="hidden" 
+                        onChange={handleImportBill}
+                        accept=".txt,.json"
+                        className="hidden"
                     />
-                     <input 
-                        type="file" 
+                    <input
+                        type="file"
                         ref={welcomeFileInputRef}
-                        onChange={handleImportBill} 
-                        accept=".txt,.json" 
-                        className="hidden" 
+                        onChange={handleImportBill}
+                        accept=".txt,.json"
+                        className="hidden"
                     />
-                    <input 
-                        type="file" 
+                    <input
+                        type="file"
                         ref={groupFileInputRef}
-                        onChange={handleImportGroups} 
-                        accept=".txt,.json" 
-                        className="hidden" 
+                        onChange={handleImportGroups}
+                        accept=".txt,.json"
+                        className="hidden"
                     />
-                
-                {/* --- WELCOME MODAL OVERLAY --- */}
-                {showWelcome && (
-                    <div className="fixed inset-0 z-[100] bg-emerald-900/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div 
-                        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="bg-emerald-600 p-6 text-center text-white sticky top-0 z-10 shadow-md">
-                        <Calculator className="w-12 h-12 mx-auto mb-2 text-emerald-100" />
-                        <h1 className="text-2xl font-bold mb-1">Tome tranquilo Pariente</h1>
-                        <p className="text-emerald-100 text-sm">Divide gastos fácil y rápido.</p>
-                        </div>
-                        <div className="p-6 space-y-6">
-                        
-                        {/* CONTINUE WITH LAST BILL SECTION */}
-                        {hasSavedData && (
-                            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 shadow-sm">
-                                <div className="flex justify-between items-center mb-3">
-                                    <h3 className="text-emerald-800 font-bold text-xs uppercase tracking-wide">Continuar donde quedaste</h3>
-                                    {bills.length > 1 && (
-                                        <div className="relative">
-                                            <select 
-                                                onChange={(e) => setActiveBillId(e.target.value)}
-                                                value={activeBillId}
-                                                className="bg-white text-emerald-900 border border-emerald-200 rounded py-1 pl-2 pr-6 text-xs outline-none focus:ring-1 focus:ring-emerald-400 appearance-none cursor-pointer"
-                                            >
-                                                {bills.map(b => (
-                                                    <option key={b.id} value={b.id}>
-                                                        {b.name || "Sin nombre"}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <ChevronDown className="absolute right-1 top-1.5 text-emerald-400 pointer-events-none" size={12}/>
-                                        </div>
-                                    )}
-                                </div>
-                                <button 
-                                onClick={() => setShowWelcome(false)}
-                                className="w-full bg-white hover:bg-emerald-100 border-2 border-emerald-500 text-emerald-700 font-bold py-3 rounded-lg transition-colors flex items-center justify-between px-4 group"
-                                >
-                                <div className="flex flex-col items-start text-left overflow-hidden mr-2">
-                                    <span className="truncate w-full text-lg group-hover:text-emerald-800">{activeBill.name || "Cuenta sin nombre"}</span>
-                                </div>
-                                <ArrowRight size={24} className="flex-shrink-0 group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </div>
-                        )}
 
-                        {/* NEW BILL / QUICK START SECTION */}
-                        <div>
-                            {hasSavedData && (
-                                <div className="relative flex py-2 items-center mb-4">
-                                    <div className="flex-grow border-t border-gray-300"></div>
-                                    <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">O crea una nueva</span>
-                                    <div className="flex-grow border-t border-gray-300"></div>
-                                </div>
-                            )}
-
-                            <div className="space-y-4">
-                                {/* Title Input */}
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Nombre (Opcional)</label>
-                                    <input 
-                                    type="text" 
-                                    value={welcomeTitle}
-                                    onChange={(e) => setWelcomeTitle(e.target.value)}
-                                    placeholder="Ej: Asado Viernes..."
-                                    className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
-                                    autoFocus={!hasSavedData}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleQuickStart()}
-                                    />
-                                </div>
-
-                                {/* People Selection */}
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">¿Quiénes participan?</label>
-                                    <div className="flex gap-2 mb-2">
-                                        <button 
-                                            onClick={() => setQsMode('count')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'count' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}
-                                        >
-                                            Número
-                                        </button>
-                                        <button 
-                                            onClick={() => setQsMode('manual')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'manual' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}
-                                        >
-                                            Nombres
-                                        </button>
-                                        <button 
-                                            onClick={() => setQsMode('group')}
-                                            disabled={savedGroups.length === 0}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'group' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'} ${savedGroups.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        >
-                                            Grupo
-                                        </button>
-                                    </div>
-
-                                    {qsMode === 'count' && (
-                                        <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
-                                            <button onClick={() => setQsPeopleCount(Math.max(1, qsPeopleCount - 1))} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Minus size={16}/></button>
-                                            <span className="font-bold text-lg w-8 text-center">{qsPeopleCount}</span>
-                                            <button onClick={() => setQsPeopleCount(qsPeopleCount + 1)} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Plus size={16}/></button>
-                                            <span className="text-sm text-gray-500 ml-2">Personas</span>
-                                        </div>
-                                    )}
-
-                                    {qsMode === 'manual' && (
-                                        <div className="relative">
-                                            <textarea
-                                                value={qsManualNames}
-                                                onChange={(e) => {
-                                                    setQsManualNames(e.target.value);
-                                                    if (qsErrors.manualNames) setQsErrors(prev => ({...prev, manualNames: false}));
-                                                }}
-                                                placeholder="Ej: Juan, Pedro, Diego..."
-                                                className={`w-full bg-white border ${qsErrors.manualNames ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all`}
-                                            />
-                                            <span className={`text-[10px] absolute bottom-2 right-2 ${qsErrors.manualNames ? 'text-red-500 font-bold' : 'text-gray-400'}`}>Separados por comas</span>
-                                        </div>
-                                    )}
-
-                                    {qsMode === 'group' && (
-                                        <select 
-                                            value={qsGroupId} 
-                                            onChange={(e) => {
-                                                setQsGroupId(e.target.value);
-                                                if (qsErrors.group) setQsErrors(prev => ({...prev, group: false}));
-                                            }}
-                                            className={`w-full bg-white border ${qsErrors.group ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 outline-none transition-all`}
-                                        >
-                                            <option value="">Selecciona un grupo...</option>
-                                            {savedGroups.map(g => (
-                                                <option key={g.id} value={g.id}>{g.name} ({g.people.length} p.)</option>
-                                            ))}
-                                        </select>
-                                    )}
-                                </div>
-
-                                {/* Items Selection */}
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Agregar Items (Opcional)</label>
-                                    <div className="flex gap-2 mb-2">
-                                        <button 
-                                            onClick={() => setQsItemsMode('presets')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'presets' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
-                                        >
-                                            Predefinidos
-                                        </button>
-                                        <button 
-                                            onClick={() => setQsItemsMode('manual')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'manual' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
-                                        >
-                                            Manual
-                                        </button>
-                                    </div>
-
-                                    {qsItemsMode === 'presets' && (
-                                        <div className="flex flex-wrap gap-2">
-                                            {PRESETS.map(item => (
-                                                <button
-                                                    key={item}
-                                                    onClick={() => togglePreset(item)}
-                                                    className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                                                        qsSelectedPresets.includes(item)
-                                                            ? 'bg-emerald-100 border-emerald-300 text-emerald-800 ring-2 ring-emerald-500 ring-offset-1'
-                                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                    }`}
-                                                >
-                                                    {item}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {qsItemsMode === 'manual' && (
-                                        <div className="relative">
-                                            <textarea
-                                                value={qsManualItems}
-                                                onChange={(e) => setQsManualItems(e.target.value)}
-                                                placeholder="Ej: Pisco, Hielo, Bebidas, Pan..."
-                                                className="w-full bg-white border border-gray-300 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all"
-                                            />
-                                            <span className="text-[10px] text-gray-400 absolute bottom-2 right-2">Separados por comas</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex gap-4">
-                                    {/* Total Bill Input */}
-                                    <div className="flex-1">
-                                        <label className={`block text-xs font-bold ${qsErrors.total ? 'text-red-500' : 'text-gray-500'} mb-1 uppercase`}>Total Boleta (Requerido)</label>
-                                        <div className="relative">
-                                            <CurrencyInput 
-                                                value={qsTotal}
-                                                onChange={(val) => {
-                                                    setQsTotal(val);
-                                                    if (qsErrors.total) setQsErrors(prev => ({...prev, total: false}));
-                                                }}
-                                                placeholder="$0"
-                                                className={`w-full text-base border ${qsErrors.total ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-emerald-500'} rounded-lg px-3 py-2 outline-none transition-all`}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Tip Percent Input */}
-                                    <div className="w-24">
-                                        <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">% Propina</label>
-                                        <div className="relative">
-                                            <input 
-                                                type="number" 
-                                                min="0"
-                                                max="100"
-                                                value={qsTipPercent}
-                                                onChange={(e) => setQsTipPercent(e.target.value)}
-                                                className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-center"
-                                            />
-                                            <span className="absolute right-4 top-2 text-gray-400 font-bold pointer-events-none">%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button 
-                                onClick={handleQuickStart}
-                                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+                    {/* --- WELCOME MODAL OVERLAY --- */}
+                    {showWelcome && (
+                        <div className="fixed inset-0 z-[100] bg-emerald-900/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+                            <div
+                                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <Plus size={20} /> Crear Cuenta Rápida
-                            </button>
-                        </div>
+                                <div className="bg-emerald-600 p-6 text-center text-white sticky top-0 z-10 shadow-md">
+                                    <Calculator className="w-12 h-12 mx-auto mb-2 text-emerald-100" />
+                                    <h1 className="text-2xl font-bold mb-1">Tome tranquilo Pariente</h1>
+                                    <p className="text-emerald-100 text-sm">Divide gastos fácil y rápido.</p>
+                                </div>
+                                <div className="p-6 space-y-6">
 
-                        {/* IMPORT SECTION */}
-                        <div className="relative flex py-2 items-center">
-                            <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="flex-shrink-0 mx-4 text-gray-400 text-[10px] uppercase">O carga una cuenta guardada</span>
-                            <div className="flex-grow border-t border-gray-300"></div>
-                        </div>
+                                    {/* CONTINUE WITH LAST BILL SECTION */}
+                                    {hasSavedData && (
+                                        <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 shadow-sm">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <h3 className="text-emerald-800 font-bold text-xs uppercase tracking-wide">Continuar donde quedaste</h3>
+                                                {bills.length > 1 && (
+                                                    <div className="relative">
+                                                        <select
+                                                            onChange={(e) => setActiveBillId(e.target.value)}
+                                                            value={activeBillId}
+                                                            className="bg-white text-emerald-900 border border-emerald-200 rounded py-1 pl-2 pr-6 text-xs outline-none focus:ring-1 focus:ring-emerald-400 appearance-none cursor-pointer"
+                                                        >
+                                                            {bills.map(b => (
+                                                                <option key={b.id} value={b.id}>
+                                                                    {b.name || "Sin nombre"}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-1 top-1.5 text-emerald-400 pointer-events-none" size={12} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <button
+                                                onClick={() => setShowWelcome(false)}
+                                                className="w-full bg-white hover:bg-emerald-100 border-2 border-emerald-500 text-emerald-700 font-bold py-3 rounded-lg transition-colors flex items-center justify-between px-4 group"
+                                            >
+                                                <div className="flex flex-col items-start text-left overflow-hidden mr-2">
+                                                    <span className="truncate w-full text-lg group-hover:text-emerald-800">{activeBill.name || "Cuenta sin nombre"}</span>
+                                                </div>
+                                                <ArrowRight size={24} className="flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+                                            </button>
+                                        </div>
+                                    )}
 
-                        {/* Button triggers the hidden input at top of app */}
-                        <button 
-                            onClick={() => welcomeFileInputRef.current.click()}
-                            className="w-full bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
+                                    {/* NEW BILL / QUICK START SECTION */}
+                                    <div>
+                                        {hasSavedData && (
+                                            <div className="relative flex py-2 items-center mb-4">
+                                                <div className="flex-grow border-t border-gray-300"></div>
+                                                <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">O crea una nueva</span>
+                                                <div className="flex-grow border-t border-gray-300"></div>
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-4">
+                                            {/* Title Input */}
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Nombre (Opcional)</label>
+                                                <input
+                                                    type="text"
+                                                    value={welcomeTitle}
+                                                    onChange={(e) => setWelcomeTitle(e.target.value)}
+                                                    placeholder="Ej: Asado Viernes..."
+                                                    className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                                    autoFocus={!hasSavedData}
+                                                    onKeyDown={(e) => e.key === 'Enter' && handleQuickStart()}
+                                                />
+                                            </div>
+
+                                            {/* People Selection */}
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">¿Quiénes participan?</label>
+                                                <div className="flex gap-2 mb-2">
+                                                    <button
+                                                        onClick={() => setQsMode('count')}
+                                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'count' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                                    >
+                                                        Número
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setQsMode('manual')}
+                                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'manual' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                                    >
+                                                        Nombres
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setQsMode('group')}
+                                                        disabled={savedGroups.length === 0}
+                                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsMode === 'group' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'} ${savedGroups.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    >
+                                                        Grupo
+                                                    </button>
+                                                </div>
+
+                                                {qsMode === 'count' && (
+                                                    <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                                        <button onClick={() => setQsPeopleCount(Math.max(1, qsPeopleCount - 1))} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Minus size={16} /></button>
+                                                        <span className="font-bold text-lg w-8 text-center">{qsPeopleCount}</span>
+                                                        <button onClick={() => setQsPeopleCount(qsPeopleCount + 1)} className="w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded hover:bg-gray-100"><Plus size={16} /></button>
+                                                        <span className="text-sm text-gray-500 ml-2">Personas</span>
+                                                    </div>
+                                                )}
+
+                                                {qsMode === 'manual' && (
+                                                    <div className="relative">
+                                                        <textarea
+                                                            value={qsManualNames}
+                                                            onChange={(e) => {
+                                                                setQsManualNames(e.target.value);
+                                                                if (qsErrors.manualNames) setQsErrors(prev => ({ ...prev, manualNames: false }));
+                                                            }}
+                                                            placeholder="Ej: Reinaldo, Raimundo, Romualdo..."
+                                                            className={`w-full bg-white border ${qsErrors.manualNames ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all`}
+                                                        />
+                                                        <span className={`text-[10px] absolute bottom-2 right-2 ${qsErrors.manualNames ? 'text-red-500 font-bold' : 'text-gray-400'}`}>Separados por comas</span>
+                                                    </div>
+                                                )}
+
+                                                {qsMode === 'group' && (
+                                                    <select
+                                                        value={qsGroupId}
+                                                        onChange={(e) => {
+                                                            setQsGroupId(e.target.value);
+                                                            if (qsErrors.group) setQsErrors(prev => ({ ...prev, group: false }));
+                                                        }}
+                                                        className={`w-full bg-white border ${qsErrors.group ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-indigo-500'} rounded-lg px-3 py-2 outline-none transition-all`}
+                                                    >
+                                                        <option value="">Selecciona un grupo...</option>
+                                                        {savedGroups.map(g => (
+                                                            <option key={g.id} value={g.id}>{g.name} ({g.people.length} p.)</option>
+                                                        ))}
+                                                    </select>
+                                                )}
+                                            </div>
+
+                                            {/* Items Selection */}
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Agregar Items (Opcional)</label>
+                                                <div className="flex gap-2 mb-2">
+                                                    <button
+                                                        onClick={() => setQsItemsMode('presets')}
+                                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'presets' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                                    >
+                                                        Predefinidos
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setQsItemsMode('manual')}
+                                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md border ${qsItemsMode === 'manual' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                                                    >
+                                                        Manual
+                                                    </button>
+                                                </div>
+
+                                                {qsItemsMode === 'presets' && (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {PRESETS.map(item => (
+                                                            <button
+                                                                key={item}
+                                                                onClick={() => togglePreset(item)}
+                                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${qsSelectedPresets.includes(item)
+                                                                    ? 'bg-emerald-100 border-emerald-300 text-emerald-800 ring-2 ring-emerald-500 ring-offset-1'
+                                                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                                    }`}
+                                                            >
+                                                                {item}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {qsItemsMode === 'manual' && (
+                                                    <div className="relative">
+                                                        <textarea
+                                                            value={qsManualItems}
+                                                            onChange={(e) => setQsManualItems(e.target.value)}
+                                                            placeholder="Ej: Pisco, 2:Cervezas:10000, 3:Hamb:15000..."
+                                                            className="w-full bg-white border border-gray-300 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm outline-none resize-none h-20 transition-all"
+                                                        />
+                                                        <span className="text-[10px] text-gray-400 absolute bottom-2 right-2">Separa con comas. Usa <b>Cantidad:Item:Total</b> para calcular el $unitario automaticamente</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex gap-4">
+                                                {/* Total Bill Input */}
+                                                <div className="flex-1">
+                                                    <label className={`block text-xs font-bold ${qsErrors.total ? 'text-red-500' : 'text-gray-500'} mb-1 uppercase`}>Total Boleta (Requerido)</label>
+                                                    <div className="relative">
+                                                        <CurrencyInput
+                                                            value={qsTotal}
+                                                            onChange={(val) => {
+                                                                setQsTotal(val);
+                                                                if (qsErrors.total) setQsErrors(prev => ({ ...prev, total: false }));
+                                                            }}
+                                                            placeholder="$0"
+                                                            className={`w-full text-base border ${qsErrors.total ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-emerald-500'} rounded-lg px-3 py-2 outline-none transition-all`}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Tip Percent Input */}
+                                                <div className="w-24">
+                                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">% Propina</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            max="100"
+                                                            value={qsTipPercent}
+                                                            onChange={(e) => setQsTipPercent(e.target.value)}
+                                                            className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-center"
+                                                        />
+                                                        <span className="absolute right-4 top-2 text-gray-400 font-bold pointer-events-none">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={handleQuickStart}
+                                            className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+                                        >
+                                            <Plus size={20} /> Crear Cuenta Rápida
+                                        </button>
+                                    </div>
+
+                                    {/* IMPORT SECTION */}
+                                    <div className="relative flex py-2 items-center">
+                                        <div className="flex-grow border-t border-gray-300"></div>
+                                        <span className="flex-shrink-0 mx-4 text-gray-400 text-[10px] uppercase">O carga una cuenta guardada</span>
+                                        <div className="flex-grow border-t border-gray-300"></div>
+                                    </div>
+
+                                    {/* Button triggers the hidden input at top of app */}
+                                    <button
+                                        onClick={() => welcomeFileInputRef.current.click()}
+                                        className="w-full bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
+                                    >
+                                        <Upload size={16} /> Cargar Cuenta (.txt)
+                                    </button>
+
+                                    <div className="mt-4 text-center pt-4 border-t border-gray-100">
+                                        <a
+                                            href="https://mendezrein.github.io/landing/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                                        >
+                                            🤖 @mendezrein links
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- HEADER --- */}
+                    <header className="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <Calculator className="h-6 w-6" />
+                                <h1 className="text-xl font-bold tracking-tight hidden sm:block">Tome tranquilo Pariente</h1>
+                                <h1 className="text-xl font-bold tracking-tight sm:hidden">Cuentas Claras</h1>
+                            </div>
+
+                            <div className="flex items-center space-x-3">
+                                <div className="flex bg-emerald-800/50 rounded-lg p-1 space-x-1">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleUndo(); }}
+                                        disabled={history.length === 0}
+                                        className={`p-1.5 rounded-md transition-colors ${history.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
+                                        title="Deshacer (Ctrl+Z)"
+                                    >
+                                        <Undo size={18} />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleRedo(); }}
+                                        disabled={future.length === 0}
+                                        className={`p-1.5 rounded-md transition-colors ${future.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
+                                        title="Rehacer (Ctrl+Y)"
+                                    >
+                                        <Redo size={18} />
+                                    </button>
+                                </div>
+
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); createNewBill(); }}
+                                    className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-md transition-colors shadow-sm border border-emerald-500 flex items-center justify-center"
+                                    title="Nueva Cuenta Rápida"
+                                >
+                                    <Plus size={20} />
+                                </button>
+
+                                <div className="relative group">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setMobileMenuOpen(!mobileMenuOpen); }}
+                                        className="flex items-center space-x-2 bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-md transition-colors text-sm border border-emerald-700"
+                                    >
+                                        <FileText size={16} />
+                                        <span className="truncate max-w-[80px] sm:max-w-[120px]">Mis Cuentas</span>
+                                        <ChevronRight size={16} className={`transform transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`} />
+                                    </button>
+
+                                    {mobileMenuOpen && (
+                                        <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 text-gray-800 p-2 animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                                            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex justify-between items-center">
+                                                <span>Seleccionar Cuenta</span>
+                                                <span className="text-[10px] bg-gray-100 px-1 rounded">{bills.length} activas</span>
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto space-y-1 mb-2 custom-scrollbar">
+                                                {bills.map(bill => (
+                                                    <div
+                                                        key={bill.id}
+                                                        onClick={() => { setActiveBillId(bill.id); setMobileMenuOpen(false); }}
+                                                        className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm group ${activeBillId === bill.id ? 'bg-emerald-100 text-emerald-800 font-medium' : 'hover:bg-gray-100'}`}
+                                                    >
+                                                        <div className="flex flex-col overflow-hidden">
+                                                            <span className="truncate">{bill.name || "Sin nombre"}</span>
+                                                            <span className="text-[10px] text-gray-400">{bill.date} • {bill.people.length} p.</span>
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); deleteBill(bill.id); }}
+                                                            className="text-gray-300 group-hover:text-red-500 p-1 hover:bg-red-50 rounded"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="border-t border-gray-100 pt-2 space-y-2">
+                                                <button
+                                                    onClick={createNewBill}
+                                                    className="w-full flex items-center justify-center space-x-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors font-medium"
+                                                >
+                                                    <Plus size={16} />
+                                                    <span>Nueva Cuenta</span>
+                                                </button>
+
+                                                <button
+                                                    onClick={() => { setMobileMenuOpen(false); setShowDeleteConfirm(true); }}
+                                                    className="w-full flex items-center justify-center space-x-2 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-md transition-colors border border-red-100 mt-2"
+                                                >
+                                                    <Trash2 size={14} />
+                                                    <span>Borrar Todos los Datos</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* --- DELETE CONFIRMATION MODAL --- */}
+                    {showDeleteConfirm && (
+                        <div
+                            className="fixed inset-0 bg-red-900/30 backdrop-blur-sm z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200"
+                            onClick={(e) => e.stopPropagation()} // Prevent closing/unselecting
                         >
-                            <Upload size={16} /> Cargar Cuenta (.txt)
-                        </button>
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-red-100">
+                                <div className="bg-red-50 p-6 text-center">
+                                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <AlertCircle className="text-red-600" size={24} />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-red-900 mb-2">¿Borrar todos los datos?</h3>
+                                    <p className="text-sm text-red-700">
+                                        Esta acción eliminará <strong>todas</strong> tus cuentas y grupos guardados. Esta acción no se puede deshacer.
+                                    </p>
+                                </div>
+                                <div className="p-4 space-y-3">
+                                    <button
+                                        onClick={performDeleteAll}
+                                        className="w-full bg-red-600 text-white hover:bg-red-700 font-bold py-3 rounded-xl transition-all shadow-sm"
+                                    >
+                                        Sí, Borrar Todo
+                                    </button>
 
-                        <div className="mt-4 text-center pt-4 border-t border-gray-100">
-                            <a 
-                                href="https://mendezrein.github.io/landing/" 
-                                target="_blank" 
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 text-sm"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- INSTRUCTION BAR --- */}
+                    <div
+                        className="bg-emerald-50 border-b border-emerald-200 px-4 py-3"
+                        onClick={(e) => e.stopPropagation()} // Prevent unselecting when reading tips
+                    >
+                        <div className="max-w-7xl mx-auto flex items-start gap-3 text-sm text-emerald-800">
+                            <Info size={18} className="mt-0.5 text-emerald-600 flex-shrink-0" />
+                            <div className="flex-1">
+                                {currentTip}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* --- DETAILED HELP BANNER --- */}
+                    {showHelp && (
+                        <div
+                            className="bg-white border-b border-emerald-100 p-4 animate-in fade-in slide-in-from-top-4"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="max-w-7xl mx-auto flex items-start justify-between">
+                                <div className="text-sm text-gray-700 space-y-1">
+                                    <h3 className="font-bold flex items-center gap-2 text-emerald-800"><HelpCircle size={16} /> Instrucciones Detalladas:</h3>
+                                    <ul className="list-disc list-inside space-y-1 ml-1">
+                                        <li>Columna <strong>Precio</strong>: Valor del item.</li>
+                                        <li>Columna <strong>División</strong>:
+                                            <ul className="pl-4 list-circle">
+                                                <li><strong>"No" o 1 (Por defecto):</strong> El precio es Unitario. Se multiplica por la cantidad consumida.</li>
+                                                <li><strong>Mayor a 1 (ej: 4):</strong> El precio es Total. Se divide entre esa cantidad de porciones.</li>
+                                            </ul>
+                                        </li>
+                                        <li><strong>Cantidades</strong>: Usa los botones - y + para ajustar cuánto consumió cada uno.</li>
+                                    </ul>
+                                </div>
+                                <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- MAIN CONTENT --- */}
+                    <main className="flex-1 max-w-7xl mx-auto w-full p-4 gap-6 flex flex-col lg:flex-row items-start overflow-hidden">
+
+                        {/* --- LEFT PANEL: THE GRID --- */}
+                        <div className="w-full lg:w-3/4 flex flex-col gap-4">
+
+                            {/* Bill Settings Bar */}
+                            <div
+                                className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap gap-4 items-center justify-between"
+                                onClick={(e) => e.stopPropagation()} // Prevent unselecting when interacting with headers
+                            >
+                                <div className="flex items-center gap-4 flex-1 min-w-[300px]">
+                                    <div className="flex-1 min-w-[150px]">
+                                        <span className="text-sm font-medium text-gray-500 block mb-1">Titulo:</span>
+                                        <input
+                                            type="text"
+                                            value={activeBill.name}
+                                            onChange={(e) => updateBill({ name: e.target.value })}
+                                            className="font-semibold text-lg border-b border-dashed border-gray-300 focus:border-emerald-500 focus:ring-0 outline-none bg-transparent w-full"
+                                        />
+                                    </div>
+                                    <div className="w-[160px]">
+                                        <span className="text-sm font-medium text-gray-500 block mb-1">Fecha:</span>
+                                        <div className="flex items-center gap-2 border-b border-dashed border-gray-300 pb-1">
+                                            <Calendar size={16} className="text-gray-400" />
+                                            <input
+                                                type="date"
+                                                value={activeBill.date}
+                                                onChange={(e) => updateBill({ date: e.target.value })}
+                                                className="font-semibold text-sm bg-transparent outline-none w-full text-slate-700"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setShowGroupModal(true)}
+                                        className="flex items-center gap-1.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-indigo-200"
+                                        title="Gestionar Grupos de Personas"
+                                    >
+                                        <Users size={16} /> <span className="hidden sm:inline">Grupos</span>
+                                    </button>
+                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                                        <span className="text-sm font-medium text-gray-600">% Propina:</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            value={activeBill.tipPercent}
+                                            onChange={(e) => updateBill({ tipPercent: parseFloat(e.target.value) || 0 })}
+                                            className="w-16 bg-white border border-gray-300 rounded px-2 py-0.5 text-right font-medium focus:ring-1 focus:ring-emerald-500 outline-none"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={exportBillToFile}
+                                        className="flex items-center gap-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-slate-300"
+                                        title="Guardar archivo .txt con todos los datos"
+                                    >
+                                        <Save size={16} /> <span className="hidden sm:inline">Guardar .txt</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* THE GRID CONTAINER */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                                <div className="overflow-x-auto pb-4">
+                                    <table className="w-full min-w-[600px] border-collapse">
+                                        <thead>
+                                            <tr className="bg-gray-50 border-b border-gray-200 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                <th className="p-3 sticky left-0 bg-gray-50 z-20 w-8">#</th>
+                                                <th className="p-3 sticky left-8 bg-gray-50 z-20 min-w-[160px]">Item</th>
+                                                <th className="p-3 w-28 text-right">Precio</th>
+                                                <th className="p-3 w-32 text-center">División</th>
+                                                {activeBill.people.map((person, idx) => (
+                                                    <th key={idx} className="p-2 min-w-[80px] text-center group relative">
+                                                        <input
+                                                            type="text"
+                                                            value={person}
+                                                            onChange={(e) => renamePerson(person, e.target.value)}
+                                                            className="w-full bg-transparent text-center focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded px-1 outline-none text-emerald-900 font-bold"
+                                                            onClick={(e) => e.stopPropagation()} // Allow renaming without triggering row click (in header)
+                                                        />
+                                                        <button
+                                                            onClick={() => removePerson(person)}
+                                                            className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 bg-white rounded-full shadow-sm p-0.5 transition-opacity"
+                                                        >
+                                                            <X size={12} />
+                                                        </button>
+                                                    </th>
+                                                ))}
+                                                <th className="p-2 w-10 text-center">
+                                                    <button onClick={addPerson} className="text-emerald-600 hover:bg-emerald-100 p-1 rounded transition-colors" title="Agregar Persona">
+                                                        <Plus size={18} />
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 text-sm">
+                                            {activeBill.items.map((item, idx) => {
+                                                let totalShares = 0;
+                                                activeBill.people.forEach(p => {
+                                                    let val = parseFloat(item.shares[p]) || 0;
+                                                    let splitCount = parseInt(item.splitCount);
+                                                    if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+                                                    if (splitCount > 1 && val > 0) val = 1;
+                                                    totalShares += val;
+                                                });
+
+                                                let splitCount = parseInt(item.splitCount);
+                                                if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
+
+                                                const isError = splitCount > 1 && splitCount !== totalShares;
+                                                const isSelected = selectedItemId === item.id;
+
+                                                // Determine Row Background Color
+                                                let rowBgColor = '';
+                                                if (isError) {
+                                                    rowBgColor = 'bg-red-100';
+                                                } else if (isSelected) {
+                                                    rowBgColor = 'bg-indigo-50'; // Highlight color
+                                                } else {
+                                                    rowBgColor = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'; // Zebra striping
+                                                }
+
+                                                return (
+                                                    <tr
+                                                        key={item.id}
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedItemId(item.id); }}
+                                                        className={`group transition-colors border-b border-gray-100 last:border-0 ${rowBgColor} ${!isError && !isSelected ? 'hover:bg-slate-100' : ''} ${isError ? 'border-l-4 border-l-red-500' : ''}`}
+                                                    >
+                                                        {/* Sticky Columns (inherit row background to cover scroll) */}
+                                                        <td className={`p-3 text-gray-400 sticky left-0 z-10 transition-colors ${rowBgColor} ${!isError && !isSelected ? 'group-hover:bg-slate-100' : ''}`}>
+                                                            {isError && <AlertCircle size={14} className="text-red-600 inline mr-1" />}
+                                                            {!isError && idx + 1}
+                                                        </td>
+                                                        <td className={`p-2 sticky left-8 z-10 transition-colors ${rowBgColor} ${!isError && !isSelected ? 'group-hover:bg-slate-100' : ''}`}>
+                                                            <input
+                                                                type="text"
+                                                                value={item.name}
+                                                                placeholder="Nombre del item"
+                                                                onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                                                                className="w-full bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors placeholder-gray-400"
+                                                            />
+                                                        </td>
+
+                                                        {/* Price Column - Striped */}
+                                                        <td className={`p-2 ${!isError && !isSelected ? 'bg-gray-50/60' : ''}`}>
+                                                            <CurrencyInput
+                                                                value={item.price}
+                                                                onChange={(val) => updateItem(item.id, 'price', val)}
+                                                                className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
+                                                            />
+                                                        </td>
+
+                                                        {/* Division Column - Not Striped */}
+                                                        <td className="p-2 text-center border-l border-r border-gray-200/50 min-w-[120px]">
+                                                            <div className="flex items-center justify-center gap-1">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const current = parseInt(item.splitCount) || 1;
+                                                                        if (current > 1) updateItem(item.id, 'splitCount', current - 1);
+                                                                    }}
+                                                                    className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${(parseInt(item.splitCount) || 1) > 1
+                                                                        ? 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                                                                        : 'opacity-0 pointer-events-none'
+                                                                        }`}
+                                                                    tabIndex="-1"
+                                                                >
+                                                                    <Minus size={12} />
+                                                                </button>
+
+                                                                <input
+                                                                    type="text"
+                                                                    inputMode="numeric"
+                                                                    value={item.splitCount == 1 ? "No" : item.splitCount}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    onFocus={(e) => e.target.select()}
+                                                                    onChange={(e) => {
+                                                                        const val = e.target.value;
+                                                                        const num = parseInt(val);
+                                                                        if (val === '') {
+                                                                            updateItem(item.id, 'splitCount', '');
+                                                                        } else if (!isNaN(num)) {
+                                                                            updateItem(item.id, 'splitCount', num);
+                                                                        }
+                                                                    }}
+                                                                    onBlur={() => {
+                                                                        if (!item.splitCount || parseInt(item.splitCount) < 1) {
+                                                                            updateItem(item.id, 'splitCount', 1);
+                                                                        }
+                                                                    }}
+                                                                    className={`w-10 text-center bg-transparent outline-none rounded py-0.5 transition-colors font-medium ${item.splitCount == 1 ? 'text-emerald-600' : 'text-slate-600'
+                                                                        } ${isError ? 'text-red-700 font-bold bg-red-200/50' : ''
+                                                                        }`}
+                                                                />
+
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const current = parseInt(item.splitCount) || 1;
+                                                                        updateItem(item.id, 'splitCount', current + 1);
+                                                                    }}
+                                                                    className="w-6 h-6 flex items-center justify-center bg-slate-200 text-slate-600 hover:bg-slate-300 rounded transition-colors"
+                                                                    tabIndex="-1"
+                                                                >
+                                                                    <Plus size={12} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+
+                                                        {/* People Columns - Alternating Stripe */}
+                                                        {activeBill.people.map((person, i) => {
+                                                            const quantity = parseFloat(item.shares[person]) || 0;
+                                                            const isStripe = i % 2 === 0; // Stripe every other person column
+
+                                                            if (splitCount > 1) {
+                                                                // CHECKBOX MODE (Split > 1)
+                                                                return (
+                                                                    <td key={person} className={`p-1 text-center border-l border-gray-200/50 ${!isError && !isSelected && isStripe ? 'bg-gray-50/60' : ''}`}>
+                                                                        <div className="flex justify-center">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={quantity > 0}
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                                onChange={(e) => updateItemShare(item.id, person, e.target.checked ? 1 : 0)}
+                                                                                className={`w-5 h-5 rounded cursor-pointer transition-colors ${isError ? 'accent-red-600' : 'accent-emerald-600'}`}
+                                                                            />
+                                                                        </div>
+                                                                    </td>
+                                                                );
+                                                            }
+
+                                                            // COUNTER MODE (Unit Price, Split == 1 or "No")
+                                                            return (
+                                                                <td key={person} className={`p-1 text-center border-l border-gray-200/50 ${!isError && !isSelected && isStripe ? 'bg-gray-50/60' : ''}`}>
+                                                                    <div className="flex items-center justify-center gap-1">
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                updateItemShare(item.id, person, quantity - 1);
+                                                                            }}
+                                                                            className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${quantity > 0
+                                                                                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                                                                                : 'opacity-0 pointer-events-none'
+                                                                                }`}
+                                                                            tabIndex="-1"
+                                                                        >
+                                                                            <Minus size={12} />
+                                                                        </button>
+
+                                                                        <span className={`w-4 text-center font-bold text-sm ${quantity > 0 ? 'text-emerald-700' : 'text-slate-300'
+                                                                            }`}>
+                                                                            {quantity > 0 ? quantity : '-'}
+                                                                        </span>
+
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                updateItemShare(item.id, person, quantity + 1);
+                                                                            }}
+                                                                            className="w-6 h-6 flex items-center justify-center bg-emerald-100 text-emerald-600 hover:bg-emerald-200 rounded transition-colors"
+                                                                            tabIndex="-1"
+                                                                        >
+                                                                            <Plus size={12} />
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            );
+                                                        })}
+                                                        <td className="p-2 text-center flex items-center justify-center gap-1">
+                                                            <button onClick={(e) => { e.stopPropagation(); duplicateItem(item.id); }} className="text-gray-400 hover:text-emerald-600 transition-colors" title="Duplicar">
+                                                                <Copy size={16} />
+                                                            </button>
+                                                            <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="text-gray-400 hover:text-red-500 transition-colors" title="Eliminar">
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                            <tr>
+                                                <td colSpan={4 + activeBill.people.length + 1} className="p-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); addItem(); }}
+                                                            className="flex items-center gap-2 text-emerald-600 font-bold hover:bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 transition-all"
+                                                        >
+                                                            <Plus size={18} /> Agregar Fila
+                                                        </button>
+
+                                                        {/* Footer Import Button - triggers hidden input */}
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
+                                                            className="flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100 transition-all"
+                                                        >
+                                                            <Upload size={18} /> Cargar Cuenta (.txt)
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* --- RIGHT PANEL: RESULTS --- */}
+                        <div
+                            className="w-full lg:w-1/4 flex flex-col gap-4"
+                            onClick={(e) => e.stopPropagation()} // Prevent unselecting when interacting with sidebar
+                        >
+                            <div
+                                ref={summaryRef}
+                                className="bg-slate-800 text-white rounded-xl shadow-lg p-6 sticky top-24 flex flex-col h-fit"
+                            >
+                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
+                                    <DollarSign size={20} />
+                                    Resumen de Pago
+                                </h2>
+
+                                <div className="space-y-4 mb-6 overflow-visible">
+                                    {activeBill.people.map(person => {
+                                        const data = calculatedResults.byPerson[person];
+                                        if (!data) return null;
+                                        // Details are now always rendered
+
+                                        return (
+                                            <div key={person} className="flex flex-col border-b border-slate-700 pb-3 last:border-0">
+                                                <div className="flex justify-between items-baseline mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-semibold text-slate-200 text-lg">{person}</span>
+                                                    </div>
+                                                    <span className="text-xl font-bold text-emerald-400">{formatCurrency(data.total)}</span>
+                                                </div>
+
+                                                {/* Always Visible Details */}
+                                                <div className="bg-slate-700/30 p-2 rounded text-xs space-y-1">
+                                                    {data.items.length > 0 ? (
+                                                        data.items.map((detail, idx) => (
+                                                            <div key={idx} className="flex justify-between text-slate-300">
+                                                                <span className="truncate max-w-[150px]">
+                                                                    {detail.name || "Item sin nombre"}
+                                                                    {detail.quantity > 1 && <span className="text-slate-500 ml-1">x{detail.quantity}</span>}
+                                                                    {detail.isSplit && <span className="text-slate-500 ml-1">(1/{detail.splitCount})</span>}
+                                                                </span>
+                                                                <span>{formatCurrency(detail.cost)}</span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-slate-500 text-center italic">Sin consumos</div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex justify-between text-xs text-slate-400 px-1 mt-1">
+                                                    <span>Consumo: {formatCurrency(data.subtotal)}</span>
+                                                    <span>+ Propina: {formatCurrency(data.tip)}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-600 space-y-2">
+                                    <div className="flex justify-between text-sm text-slate-400">
+                                        <span>Subtotal Items</span>
+                                        <span>{formatCurrency(calculatedResults.billSubtotal)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm text-slate-400">
+                                        <span>Total Propina ({activeBill.tipPercent}%)</span>
+                                        <span>{formatCurrency(calculatedResults.totalTip)}</span>
+                                    </div>
+
+                                    {Math.abs(calculatedResults.unallocatedTotal) > 1 && (
+                                        <div className="flex justify-between text-sm font-bold text-red-400 mt-2 bg-red-900/30 p-2 rounded">
+                                            <span>Por Asignar/Error:</span>
+                                            <span>{formatCurrency(calculatedResults.unallocatedTotal)}</span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-end mt-4 pt-2 border-t border-slate-700">
+                                        <span className="font-bold text-lg">Gran Total</span>
+                                        <span className="font-extrabold text-3xl text-white">{formatCurrency(calculatedResults.billTotal)}</span>
+                                    </div>
+                                </div>
+
+                                {/* --- VERIFICATION SECTION --- */}
+                                <div className="mt-6 pt-6 border-t border-slate-600 flex flex-col gap-3">
+                                    <div>
+                                        <label className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Verificar con Boleta</label>
+                                        <div className="relative">
+                                            <CurrencyInput
+                                                value={activeBill.verificationTotal}
+                                                onChange={(val) => updateBill({ verificationTotal: val })}
+                                                placeholder="$ Total Boleta"
+                                                className={`w-full bg-slate-700 text-white rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-right ${calculatedResults.isMismatch ? 'ring-2 ring-red-500' : ''}`}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {activeBill.verificationTotal > 0 && (
+                                        <div className={`text-center text-sm font-bold p-2 rounded flex justify-between items-center ${calculatedResults.isMismatch ? 'bg-red-900/50 text-red-300' : 'bg-emerald-900/50 text-emerald-300'}`}>
+                                            <span>
+                                                {calculatedResults.isMismatch
+                                                    ? (calculatedResults.difference > 0 ? 'Sobran:' : 'Faltan:')
+                                                    : '¡Cuadra!'}
+                                            </span>
+                                            <span>
+                                                {calculatedResults.difference > 0 ? '+' : ''}
+                                                {formatCurrency(calculatedResults.difference)}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-2 mt-2">
+                                        <button
+                                            onClick={handleExportImage}
+                                            className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded-lg transition-all"
+                                            title="Compartir, Copiar o Descargar imagen"
+                                        >
+                                            <Share2 size={16} /> Compartir Imagen
+                                        </button>
+                                        <button
+                                            onClick={handleDraftMessage}
+                                            disabled={activeBill.items.length === 0}
+                                            className="flex-[2] flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                                        >
+                                            <MessageSquare size={18} />
+                                            WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </main>
+
+                    {/* --- FEATURES FOOTER --- */}
+                    <footer
+                        className="max-w-7xl mx-auto w-full px-6 py-12 mt-8 border-t border-gray-200"
+                        onClick={(e) => e.stopPropagation()} // Prevent unselecting when reading footer
+                    >
+                        <h3 className="text-xl font-bold text-slate-700 mb-6 text-center">Todo lo que puedes hacer</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {FEATURES.map((feat, idx) => (
+                                <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+                                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                                        {feat.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-800">{feat.title}</h4>
+                                        <p className="text-sm text-slate-500 leading-relaxed">{feat.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-12 text-center pt-8 border-t border-gray-100">
+                            <a
+                                href="https://mendezrein.github.io/landing/"
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
                             >
                                 🤖 @mendezrein links
                             </a>
                         </div>
-                        </div>
-                    </div>
-                    </div>
-                )}
+                    </footer>
 
-                {/* --- HEADER --- */}
-                <header className="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <Calculator className="h-6 w-6" />
-                        <h1 className="text-xl font-bold tracking-tight hidden sm:block">Tome tranquilo Pariente</h1>
-                        <h1 className="text-xl font-bold tracking-tight sm:hidden">Cuentas Claras</h1>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3">
-                        <div className="flex bg-emerald-800/50 rounded-lg p-1 space-x-1">
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); handleUndo(); }}
-                            disabled={history.length === 0}
-                            className={`p-1.5 rounded-md transition-colors ${history.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
-                            title="Deshacer (Ctrl+Z)"
-                        >
-                            <Undo size={18} />
-                        </button>
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); handleRedo(); }}
-                            disabled={future.length === 0}
-                            className={`p-1.5 rounded-md transition-colors ${future.length === 0 ? 'text-emerald-500 cursor-not-allowed' : 'hover:bg-emerald-600 text-white'}`}
-                            title="Rehacer (Ctrl+Y)"
-                        >
-                            <Redo size={18} />
-                        </button>
-                        </div>
-
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); createNewBill(); }}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-md transition-colors shadow-sm border border-emerald-500 flex items-center justify-center"
-                            title="Nueva Cuenta Rápida"
-                        >
-                            <Plus size={20} />
-                        </button>
-
-                        <div className="relative group">
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); setMobileMenuOpen(!mobileMenuOpen); }}
-                            className="flex items-center space-x-2 bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-md transition-colors text-sm border border-emerald-700"
-                        >
-                            <FileText size={16} />
-                            <span className="truncate max-w-[80px] sm:max-w-[120px]">Mis Cuentas</span>
-                            <ChevronRight size={16} className={`transform transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`} />
-                        </button>
-                        
-                        {mobileMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 text-gray-800 p-2 animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-                            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex justify-between items-center">
-                                <span>Seleccionar Cuenta</span>
-                                <span className="text-[10px] bg-gray-100 px-1 rounded">{bills.length} activas</span>
-                            </div>
-                            <div className="max-h-60 overflow-y-auto space-y-1 mb-2 custom-scrollbar">
-                                {bills.map(bill => (
-                                <div 
-                                    key={bill.id} 
-                                    onClick={() => { setActiveBillId(bill.id); setMobileMenuOpen(false); }}
-                                    className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm group ${activeBillId === bill.id ? 'bg-emerald-100 text-emerald-800 font-medium' : 'hover:bg-gray-100'}`}
-                                >
-                                    <div className="flex flex-col overflow-hidden">
-                                        <span className="truncate">{bill.name || "Sin nombre"}</span>
-                                        <span className="text-[10px] text-gray-400">{bill.date} • {bill.people.length} p.</span>
+                    {/* --- DRAFT MESSAGE MODAL --- */}
+                    {aiDraftMessage && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+                                <div className="bg-emerald-600 p-4 text-white flex justify-between items-center">
+                                    <span className="font-bold flex items-center gap-2"><MessageSquare size={18} /> Resumen para Copiar</span>
+                                    <button onClick={() => setAiDraftMessage("")} className="hover:bg-emerald-700 p-1 rounded"><X size={20} /></button>
+                                </div>
+                                <div className="p-6">
+                                    <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-emerald-900 font-sans whitespace-pre-wrap mb-6 max-h-[50vh] overflow-y-auto">
+                                        {aiDraftMessage}
                                     </div>
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); deleteBill(bill.id); }}
-                                        className="text-gray-300 group-hover:text-red-500 p-1 hover:bg-red-50 rounded"
+                                    <button
+                                        onClick={() => {
+                                            copyToClipboard(aiDraftMessage);
+                                            setAiDraftMessage("");
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all"
                                     >
-                                        <Trash2 size={14} />
+                                        <Clipboard size={18} /> Copiar y Cerrar
                                     </button>
                                 </div>
-                                ))}
                             </div>
-                            <div className="border-t border-gray-100 pt-2 space-y-2">
-                                <button 
-                                onClick={createNewBill}
-                                className="w-full flex items-center justify-center space-x-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors font-medium"
-                                >
-                                <Plus size={16} />
-                                <span>Nueva Cuenta</span>
-                                </button>
-                                
-                                <button 
-                                    onClick={() => { setMobileMenuOpen(false); setShowDeleteConfirm(true); }}
-                                    className="w-full flex items-center justify-center space-x-2 text-xs bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-md transition-colors border border-red-100 mt-2"
-                                >
-                                    <Trash2 size={14} />
-                                    <span>Borrar Todos los Datos</span>
-                                </button>
-                            </div>
-                            </div>
-                        )}
                         </div>
-                    </div>
-                    </div>
-                </header>
+                    )}
 
-                {/* --- DELETE CONFIRMATION MODAL --- */}
-                {showDeleteConfirm && (
-                    <div 
-                        className="fixed inset-0 bg-red-900/30 backdrop-blur-sm z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200"
-                        onClick={(e) => e.stopPropagation()} // Prevent closing/unselecting
-                    >
-                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-red-100">
-                            <div className="bg-red-50 p-6 text-center">
-                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <AlertCircle className="text-red-600" size={24} />
+                    {/* --- GROUPS MODAL --- */}
+                    {showGroupModal && (
+                        <div
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                                <div className="bg-indigo-600 p-6 text-white flex justify-between items-center">
+                                    <h3 className="text-xl font-bold flex items-center gap-2"><Users size={20} /> Gestionar Grupos</h3>
+                                    <button onClick={() => setShowGroupModal(false)} className="text-indigo-200 hover:text-white"><X size={24} /></button>
                                 </div>
-                                <h3 className="text-lg font-bold text-red-900 mb-2">¿Borrar todos los datos?</h3>
-                                <p className="text-sm text-red-700">
-                                    Esta acción eliminará <strong>todas</strong> tus cuentas y grupos guardados. Esta acción no se puede deshacer.
-                                </p>
-                            </div>
-                            <div className="p-4 space-y-3">
-                                <button 
-                                    onClick={performDeleteAll}
-                                    className="w-full bg-red-600 text-white hover:bg-red-700 font-bold py-3 rounded-xl transition-all shadow-sm"
-                                >
-                                    Sí, Borrar Todo
-                                </button>
-                                
-                                <button 
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                    className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 text-sm"
-                                >
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                                <div className="p-6 space-y-6">
 
-                {/* --- INSTRUCTION BAR --- */}
-                <div 
-                    className="bg-emerald-50 border-b border-emerald-200 px-4 py-3"
-                    onClick={(e) => e.stopPropagation()} // Prevent unselecting when reading tips
-                >
-                    <div className="max-w-7xl mx-auto flex items-start gap-3 text-sm text-emerald-800">
-                    <Info size={18} className="mt-0.5 text-emerald-600 flex-shrink-0" />
-                    <div className="flex-1">
-                        {currentTip}
-                    </div>
-                    </div>
-                </div>
-
-                {/* --- DETAILED HELP BANNER --- */}
-                {showHelp && (
-                    <div 
-                        className="bg-white border-b border-emerald-100 p-4 animate-in fade-in slide-in-from-top-4"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                    <div className="max-w-7xl mx-auto flex items-start justify-between">
-                        <div className="text-sm text-gray-700 space-y-1">
-                        <h3 className="font-bold flex items-center gap-2 text-emerald-800"><HelpCircle size={16}/> Instrucciones Detalladas:</h3>
-                        <ul className="list-disc list-inside space-y-1 ml-1">
-                            <li>Columna <strong>Precio</strong>: Valor del item.</li>
-                            <li>Columna <strong>División</strong>: 
-                            <ul className="pl-4 list-circle">
-                                <li><strong>"No" o 1 (Por defecto):</strong> El precio es Unitario. Se multiplica por la cantidad consumida.</li>
-                                <li><strong>Mayor a 1 (ej: 4):</strong> El precio es Total. Se divide entre esa cantidad de porciones.</li>
-                            </ul>
-                            </li>
-                            <li><strong>Cantidades</strong>: Usa los botones - y + para ajustar cuánto consumió cada uno.</li>
-                        </ul>
-                        </div>
-                        <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
-                    </div>
-                    </div>
-                )}
-
-                {/* --- MAIN CONTENT --- */}
-                <main className="flex-1 max-w-7xl mx-auto w-full p-4 gap-6 flex flex-col lg:flex-row items-start overflow-hidden">
-                    
-                    {/* --- LEFT PANEL: THE GRID --- */}
-                    <div className="w-full lg:w-3/4 flex flex-col gap-4">
-                    
-                    {/* Bill Settings Bar */}
-                    <div 
-                        className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap gap-4 items-center justify-between"
-                        onClick={(e) => e.stopPropagation()} // Prevent unselecting when interacting with headers
-                    >
-                        <div className="flex items-center gap-4 flex-1 min-w-[300px]">
-                        <div className="flex-1 min-w-[150px]">
-                            <span className="text-sm font-medium text-gray-500 block mb-1">Titulo:</span>
-                            <input 
-                            type="text" 
-                            value={activeBill.name} 
-                            onChange={(e) => updateBill({ name: e.target.value })}
-                            className="font-semibold text-lg border-b border-dashed border-gray-300 focus:border-emerald-500 focus:ring-0 outline-none bg-transparent w-full"
-                            />
-                        </div>
-                        <div className="w-[160px]">
-                            <span className="text-sm font-medium text-gray-500 block mb-1">Fecha:</span>
-                            <div className="flex items-center gap-2 border-b border-dashed border-gray-300 pb-1">
-                            <Calendar size={16} className="text-gray-400" />
-                            <input 
-                                type="date" 
-                                value={activeBill.date}
-                                onChange={(e) => updateBill({ date: e.target.value })}
-                                className="font-semibold text-sm bg-transparent outline-none w-full text-slate-700" 
-                            />
-                            </div>
-                        </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setShowGroupModal(true)}
-                            className="flex items-center gap-1.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-indigo-200"
-                            title="Gestionar Grupos de Personas"
-                        >
-                            <Users size={16} /> <span className="hidden sm:inline">Grupos</span>
-                        </button>
-                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                            <span className="text-sm font-medium text-gray-600">% Propina:</span>
-                            <input 
-                            type="number" 
-                            min="0"
-                            max="100"
-                            value={activeBill.tipPercent}
-                            onChange={(e) => updateBill({ tipPercent: parseFloat(e.target.value) || 0 })}
-                            className="w-16 bg-white border border-gray-300 rounded px-2 py-0.5 text-right font-medium focus:ring-1 focus:ring-emerald-500 outline-none"
-                            />
-                        </div>
-                        <button 
-                            onClick={exportBillToFile}
-                            className="flex items-center gap-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors text-sm font-bold border border-slate-300"
-                            title="Guardar archivo .txt con todos los datos"
-                        >
-                            <Save size={16} /> <span className="hidden sm:inline">Guardar .txt</span>
-                        </button>
-                        </div>
-                    </div>
-
-                    {/* THE GRID CONTAINER */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-                        <div className="overflow-x-auto pb-4">
-                        <table className="w-full min-w-[600px] border-collapse">
-                            <thead>
-                            <tr className="bg-gray-50 border-b border-gray-200 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <th className="p-3 sticky left-0 bg-gray-50 z-20 w-8">#</th>
-                                <th className="p-3 sticky left-8 bg-gray-50 z-20 min-w-[160px]">Item</th>
-                                <th className="p-3 w-28 text-right">Precio</th>
-                                <th className="p-3 w-32 text-center">División</th>
-                                {activeBill.people.map((person, idx) => (
-                                <th key={idx} className="p-2 min-w-[80px] text-center group relative">
-                                    <input 
-                                    type="text"
-                                    value={person}
-                                    onChange={(e) => renamePerson(person, e.target.value)}
-                                    className="w-full bg-transparent text-center focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded px-1 outline-none text-emerald-900 font-bold"
-                                    onClick={(e) => e.stopPropagation()} // Allow renaming without triggering row click (in header)
-                                    />
-                                    <button 
-                                    onClick={() => removePerson(person)}
-                                    className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 bg-white rounded-full shadow-sm p-0.5 transition-opacity"
-                                    >
-                                    <X size={12} />
-                                    </button>
-                                </th>
-                                ))}
-                                <th className="p-2 w-10 text-center">
-                                <button onClick={addPerson} className="text-emerald-600 hover:bg-emerald-100 p-1 rounded transition-colors" title="Agregar Persona">
-                                    <Plus size={18} />
-                                </button>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 text-sm">
-                            {activeBill.items.map((item, idx) => {
-                                let totalShares = 0;
-                                activeBill.people.forEach(p => {
-                                    let val = parseFloat(item.shares[p]) || 0;
-                                    let splitCount = parseInt(item.splitCount);
-                                    if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
-                                    if (splitCount > 1 && val > 0) val = 1; 
-                                    totalShares += val;
-                                });
-                                
-                                let splitCount = parseInt(item.splitCount);
-                                if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
-                                
-                                const isError = splitCount > 1 && splitCount !== totalShares;
-                                const isSelected = selectedItemId === item.id;
-
-                                // Determine Row Background Color
-                                let rowBgColor = '';
-                                if (isError) {
-                                    rowBgColor = 'bg-red-100';
-                                } else if (isSelected) {
-                                    rowBgColor = 'bg-indigo-50'; // Highlight color
-                                } else {
-                                    rowBgColor = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'; // Zebra striping
-                                }
-
-                                return (
-                                <tr 
-                                    key={item.id} 
-                                    onClick={(e) => { e.stopPropagation(); setSelectedItemId(item.id); }}
-                                    className={`group transition-colors border-b border-gray-100 last:border-0 ${rowBgColor} ${!isError && !isSelected ? 'hover:bg-slate-100' : ''} ${isError ? 'border-l-4 border-l-red-500' : ''}`}
-                                >
-                                    {/* Sticky Columns (inherit row background to cover scroll) */}
-                                    <td className={`p-3 text-gray-400 sticky left-0 z-10 transition-colors ${rowBgColor} ${!isError && !isSelected ? 'group-hover:bg-slate-100' : ''}`}>
-                                    {isError && <AlertCircle size={14} className="text-red-600 inline mr-1" />}
-                                    {!isError && idx + 1}
-                                    </td>
-                                    <td className={`p-2 sticky left-8 z-10 transition-colors ${rowBgColor} ${!isError && !isSelected ? 'group-hover:bg-slate-100' : ''}`}>
-                                    <input 
-                                        type="text" 
-                                        value={item.name}
-                                        placeholder="Nombre del item"
-                                        onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                                        className="w-full bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors placeholder-gray-400"
-                                    />
-                                    </td>
-                                    
-                                    {/* Price Column - Striped */}
-                                    <td className={`p-2 ${!isError && !isSelected ? 'bg-gray-50/60' : ''}`}>
-                                    <CurrencyInput 
-                                        value={item.price} 
-                                        onChange={(val) => updateItem(item.id, 'price', val)} 
-                                        className="w-full text-right bg-transparent outline-none border-b border-transparent focus:border-emerald-500 transition-colors font-mono"
-                                    />
-                                    </td>
-                                    
-                                    {/* Division Column - Not Striped */}
-                                    <td className="p-2 text-center border-l border-r border-gray-200/50 min-w-[120px]">
-                                    <div className="flex items-center justify-center gap-1">
-                                        <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const current = parseInt(item.splitCount) || 1;
-                                            if (current > 1) updateItem(item.id, 'splitCount', current - 1);
-                                        }}
-                                        className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
-                                            (parseInt(item.splitCount) || 1) > 1 
-                                            ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' 
-                                            : 'opacity-0 pointer-events-none'
-                                        }`}
-                                        tabIndex="-1"
-                                        >
-                                        <Minus size={12} />
-                                        </button>
-
-                                        <input 
-                                        type="text" 
-                                        inputMode="numeric"
-                                        value={item.splitCount == 1 ? "No" : item.splitCount}
-                                        onClick={(e) => e.stopPropagation()}
-                                        onFocus={(e) => e.target.select()}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            const num = parseInt(val);
-                                            if (val === '') {
-                                            updateItem(item.id, 'splitCount', '');
-                                            } else if (!isNaN(num)) {
-                                            updateItem(item.id, 'splitCount', num);
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            if (!item.splitCount || parseInt(item.splitCount) < 1) {
-                                            updateItem(item.id, 'splitCount', 1);
-                                            }
-                                        }}
-                                        className={`w-10 text-center bg-transparent outline-none rounded py-0.5 transition-colors font-medium ${
-                                            item.splitCount == 1 ? 'text-emerald-600' : 'text-slate-600'
-                                        } ${
-                                            isError ? 'text-red-700 font-bold bg-red-200/50' : ''
-                                        }`}
-                                        />
-
-                                        <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const current = parseInt(item.splitCount) || 1;
-                                            updateItem(item.id, 'splitCount', current + 1);
-                                        }}
-                                        className="w-6 h-6 flex items-center justify-center bg-slate-200 text-slate-600 hover:bg-slate-300 rounded transition-colors"
-                                        tabIndex="-1"
-                                        >
-                                        <Plus size={12} />
-                                        </button>
-                                    </div>
-                                    </td>
-                                    
-                                    {/* People Columns - Alternating Stripe */}
-                                    {activeBill.people.map((person, i) => {
-                                    const quantity = parseFloat(item.shares[person]) || 0;
-                                    const isStripe = i % 2 === 0; // Stripe every other person column
-                                    
-                                    if (splitCount > 1) {
-                                        // CHECKBOX MODE (Split > 1)
-                                        return (
-                                            <td key={person} className={`p-1 text-center border-l border-gray-200/50 ${!isError && !isSelected && isStripe ? 'bg-gray-50/60' : ''}`}>
-                                                <div className="flex justify-center">
-                                                    <input 
-                                                        type="checkbox"
-                                                        checked={quantity > 0}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        onChange={(e) => updateItemShare(item.id, person, e.target.checked ? 1 : 0)}
-                                                        className={`w-5 h-5 rounded cursor-pointer transition-colors ${isError ? 'accent-red-600' : 'accent-emerald-600'}`}
-                                                    />
-                                                </div>
-                                            </td>
-                                        );
-                                    }
-
-                                    // COUNTER MODE (Unit Price, Split == 1 or "No")
-                                    return (
-                                        <td key={person} className={`p-1 text-center border-l border-gray-200/50 ${!isError && !isSelected && isStripe ? 'bg-gray-50/60' : ''}`}>
-                                        <div className="flex items-center justify-center gap-1">
-                                            <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                updateItemShare(item.id, person, quantity - 1);
-                                            }}
-                                            className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
-                                                quantity > 0 
-                                                ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                                                : 'opacity-0 pointer-events-none'
-                                            }`}
-                                            tabIndex="-1"
+                                    {/* Save Current Group */}
+                                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                                        <h4 className="font-bold text-indigo-900 mb-2 text-sm uppercase tracking-wide">Guardar Grupo Actual</h4>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={newGroupName}
+                                                onChange={(e) => setNewGroupName(e.target.value)}
+                                                placeholder="Nombre del grupo (ej: Familia, Oficina)"
+                                                className="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            />
+                                            <button
+                                                onClick={handleSaveGroup}
+                                                disabled={!newGroupName.trim()}
+                                                className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white p-2 rounded-lg transition-colors"
                                             >
-                                            <Minus size={12} />
-                                            </button>
-                                            
-                                            <span className={`w-4 text-center font-bold text-sm ${
-                                            quantity > 0 ? 'text-emerald-700' : 'text-slate-300'
-                                            }`}>
-                                            {quantity > 0 ? quantity : '-'}
-                                            </span>
-
-                                            <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                updateItemShare(item.id, person, quantity + 1);
-                                            }}
-                                            className="w-6 h-6 flex items-center justify-center bg-emerald-100 text-emerald-600 hover:bg-emerald-200 rounded transition-colors"
-                                            tabIndex="-1"
-                                            >
-                                            <Plus size={12} />
+                                                <Save size={18} />
                                             </button>
                                         </div>
-                                        </td>
-                                    );
-                                    })}
-                                    <td className="p-2 text-center flex items-center justify-center gap-1">
-                                    <button onClick={(e) => { e.stopPropagation(); duplicateItem(item.id); }} className="text-gray-400 hover:text-emerald-600 transition-colors" title="Duplicar">
-                                        <Copy size={16} />
-                                    </button>
-                                    <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="text-gray-400 hover:text-red-500 transition-colors" title="Eliminar">
-                                        <Trash2 size={16} />
-                                    </button>
-                                    </td>
-                                </tr>
-                                );
-                            })}
-                            <tr>
-                                <td colSpan={4 + activeBill.people.length + 1} className="p-4">
-                                <div className="flex items-center gap-4">
-                                    <button 
-                                    onClick={(e) => { e.stopPropagation(); addItem(); }}
-                                    className="flex items-center gap-2 text-emerald-600 font-bold hover:bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 transition-all"
-                                    >
-                                    <Plus size={18} /> Agregar Fila
-                                    </button>
-                                    
-                                    {/* Footer Import Button - triggers hidden input */}
-                                    <button 
-                                    onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
-                                    className="flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100 transition-all"
-                                    >
-                                    <Upload size={18} /> Cargar Cuenta (.txt)
-                                    </button>
-                                </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                    </div>
-                    </div>
+                                        <p className="text-xs text-indigo-400 mt-2">
+                                            Se guardarán: {activeBill.people.join(", ")}
+                                        </p>
+                                    </div>
 
-                    {/* --- RIGHT PANEL: RESULTS --- */}
-                    <div 
-                        className="w-full lg:w-1/4 flex flex-col gap-4"
-                        onClick={(e) => e.stopPropagation()} // Prevent unselecting when interacting with sidebar
-                    >
-                    <div 
-                        ref={summaryRef} 
-                        className="bg-slate-800 text-white rounded-xl shadow-lg p-6 sticky top-24 flex flex-col h-fit"
-                    >
-                        <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
-                        <DollarSign size={20} />
-                        Resumen de Pago
-                        </h2>
+                                    {/* Export/Import Groups Buttons */}
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => groupFileInputRef.current.click()}
+                                            className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <Upload size={16} /> Importar Grupos
+                                        </button>
+                                        <button
+                                            onClick={exportGroupsToFile}
+                                            className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <Download size={16} /> Exportar Grupos
+                                        </button>
+                                    </div>
 
-                        <div className="space-y-4 mb-6 overflow-visible">
-                        {activeBill.people.map(person => {
-                            const data = calculatedResults.byPerson[person];
-                            if (!data) return null;
-                            // Details are now always rendered
-
-                            return (
-                            <div key={person} className="flex flex-col border-b border-slate-700 pb-3 last:border-0">
-                                <div className="flex justify-between items-baseline mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-slate-200 text-lg">{person}</span>
-                                </div>
-                                <span className="text-xl font-bold text-emerald-400">{formatCurrency(data.total)}</span>
-                                </div>
-                                
-                                {/* Always Visible Details */}
-                                <div className="bg-slate-700/30 p-2 rounded text-xs space-y-1">
-                                    {data.items.length > 0 ? (
-                                    data.items.map((detail, idx) => (
-                                        <div key={idx} className="flex justify-between text-slate-300">
-                                        <span className="truncate max-w-[150px]">
-                                            {detail.name || "Item sin nombre"} 
-                                            {detail.quantity > 1 && <span className="text-slate-500 ml-1">x{detail.quantity}</span>}
-                                            {detail.isSplit && <span className="text-slate-500 ml-1">(1/{detail.splitCount})</span>}
-                                        </span>
-                                        <span>{formatCurrency(detail.cost)}</span>
+                                    {/* Saved Groups List */}
+                                    <div>
+                                        <h4 className="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wide">Grupos Guardados</h4>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                                            {savedGroups.length === 0 ? (
+                                                <p className="text-gray-400 text-sm italic">No hay grupos guardados aún.</p>
+                                            ) : (
+                                                savedGroups.map(group => (
+                                                    <div key={group.id} className="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-lg hover:shadow-sm transition-shadow">
+                                                        <div className="overflow-hidden">
+                                                            <p className="font-bold text-gray-800 truncate">{group.name}</p>
+                                                            <p className="text-xs text-gray-500 truncate">{group.people.join(", ")}</p>
+                                                        </div>
+                                                        <div className="flex gap-2 ml-2">
+                                                            <button
+                                                                onClick={() => handleLoadGroup(group.people)}
+                                                                className="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded transition-colors text-xs font-bold border border-emerald-200"
+                                                            >
+                                                                Cargar
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteGroup(group.id)}
+                                                                className="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
                                         </div>
-                                    ))
-                                    ) : (
-                                    <div className="text-slate-500 text-center italic">Sin consumos</div>
-                                    )}
-                                </div>
-
-                                <div className="flex justify-between text-xs text-slate-400 px-1 mt-1">
-                                    <span>Consumo: {formatCurrency(data.subtotal)}</span>
-                                    <span>+ Propina: {formatCurrency(data.tip)}</span>
-                                </div>
-                            </div>
-                            );
-                        })}
-                        </div>
-
-                        <div className="pt-4 border-t border-slate-600 space-y-2">
-                        <div className="flex justify-between text-sm text-slate-400">
-                            <span>Subtotal Items</span>
-                            <span>{formatCurrency(calculatedResults.billSubtotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-slate-400">
-                            <span>Total Propina ({activeBill.tipPercent}%)</span>
-                            <span>{formatCurrency(calculatedResults.totalTip)}</span>
-                        </div>
-                        
-                        {Math.abs(calculatedResults.unallocatedTotal) > 1 && (
-                            <div className="flex justify-between text-sm font-bold text-red-400 mt-2 bg-red-900/30 p-2 rounded">
-                            <span>Por Asignar/Error:</span>
-                            <span>{formatCurrency(calculatedResults.unallocatedTotal)}</span>
-                            </div>
-                        )}
-
-                        <div className="flex justify-between items-end mt-4 pt-2 border-t border-slate-700">
-                            <span className="font-bold text-lg">Gran Total</span>
-                            <span className="font-extrabold text-3xl text-white">{formatCurrency(calculatedResults.billTotal)}</span>
-                        </div>
-                        </div>
-
-                        {/* --- VERIFICATION SECTION --- */}
-                        <div className="mt-6 pt-6 border-t border-slate-600 flex flex-col gap-3">
-                        <div>
-                            <label className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Verificar con Boleta</label>
-                            <div className="relative">
-                            <CurrencyInput 
-                                value={activeBill.verificationTotal}
-                                onChange={(val) => updateBill({ verificationTotal: val })}
-                                placeholder="$ Total Boleta"
-                                className={`w-full bg-slate-700 text-white rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-emerald-500 text-right ${calculatedResults.isMismatch ? 'ring-2 ring-red-500' : ''}`}
-                            />
-                            </div>
-                        </div>
-
-                        {activeBill.verificationTotal > 0 && (
-                            <div className={`text-center text-sm font-bold p-2 rounded flex justify-between items-center ${calculatedResults.isMismatch ? 'bg-red-900/50 text-red-300' : 'bg-emerald-900/50 text-emerald-300'}`}>
-                                <span>
-                                    {calculatedResults.isMismatch 
-                                        ? (calculatedResults.difference > 0 ? 'Sobran:' : 'Faltan:') 
-                                        : '¡Cuadra!'}
-                                </span>
-                                <span>
-                                    {calculatedResults.difference > 0 ? '+' : ''}
-                                    {formatCurrency(calculatedResults.difference)}
-                                </span>
-                            </div>
-                        )}
-
-                        <div className="flex gap-2 mt-2">
-                            <button 
-                                onClick={handleExportImage}
-                                className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded-lg transition-all"
-                                title="Compartir, Copiar o Descargar imagen"
-                            >
-                                <Share2 size={16} /> Compartir Imagen
-                            </button>
-                            <button 
-                                onClick={handleDraftMessage}
-                                disabled={activeBill.items.length === 0}
-                                className="flex-[2] flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50"
-                            >
-                                <MessageSquare size={18} />
-                                WhatsApp
-                            </button>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-
-                </main>
-
-                {/* --- FEATURES FOOTER --- */}
-                <footer 
-                    className="max-w-7xl mx-auto w-full px-6 py-12 mt-8 border-t border-gray-200"
-                    onClick={(e) => e.stopPropagation()} // Prevent unselecting when reading footer
-                >
-                    <h3 className="text-xl font-bold text-slate-700 mb-6 text-center">Todo lo que puedes hacer</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {FEATURES.map((feat, idx) => (
-                        <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
-                        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-                            {feat.icon}
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-slate-800">{feat.title}</h4>
-                            <p className="text-sm text-slate-500 leading-relaxed">{feat.desc}</p>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-
-                    <div className="mt-12 text-center pt-8 border-t border-gray-100">
-                        <a 
-                            href="https://mendezrein.github.io/landing/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                        >
-                            🤖 @mendezrein links
-                        </a>
-                    </div>
-                </footer>
-
-                {/* --- DRAFT MESSAGE MODAL --- */}
-                {aiDraftMessage && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-                        <div className="bg-emerald-600 p-4 text-white flex justify-between items-center">
-                        <span className="font-bold flex items-center gap-2"><MessageSquare size={18}/> Resumen para Copiar</span>
-                        <button onClick={() => setAiDraftMessage("")} className="hover:bg-emerald-700 p-1 rounded"><X size={20}/></button>
-                        </div>
-                        <div className="p-6">
-                        <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-emerald-900 font-sans whitespace-pre-wrap mb-6 max-h-[50vh] overflow-y-auto">
-                            {aiDraftMessage}
-                        </div>
-                        <button 
-                            onClick={() => {
-                            copyToClipboard(aiDraftMessage);
-                            setAiDraftMessage("");
-                            }}
-                            className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all"
-                        >
-                            <Clipboard size={18}/> Copiar y Cerrar
-                        </button>
-                        </div>
-                    </div>
-                    </div>
-                )}
-
-                {/* --- GROUPS MODAL --- */}
-                {showGroupModal && (
-                    <div 
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-                        <div className="bg-indigo-600 p-6 text-white flex justify-between items-center">
-                        <h3 className="text-xl font-bold flex items-center gap-2"><Users size={20}/> Gestionar Grupos</h3>
-                        <button onClick={() => setShowGroupModal(false)} className="text-indigo-200 hover:text-white"><X size={24}/></button>
-                        </div>
-                        <div className="p-6 space-y-6">
-                        
-                        {/* Save Current Group */}
-                        <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                            <h4 className="font-bold text-indigo-900 mb-2 text-sm uppercase tracking-wide">Guardar Grupo Actual</h4>
-                            <div className="flex gap-2">
-                            <input 
-                                type="text" 
-                                value={newGroupName}
-                                onChange={(e) => setNewGroupName(e.target.value)}
-                                placeholder="Nombre del grupo (ej: Familia, Oficina)"
-                                className="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                            <button 
-                                onClick={handleSaveGroup}
-                                disabled={!newGroupName.trim()}
-                                className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white p-2 rounded-lg transition-colors"
-                            >
-                                <Save size={18} />
-                            </button>
-                            </div>
-                            <p className="text-xs text-indigo-400 mt-2">
-                            Se guardarán: {activeBill.people.join(", ")}
-                            </p>
-                        </div>
-
-                        {/* Export/Import Groups Buttons */}
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={() => groupFileInputRef.current.click()}
-                                className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-                            >
-                                <Upload size={16} /> Importar Grupos
-                            </button>
-                            <button 
-                                onClick={exportGroupsToFile}
-                                className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-                            >
-                                <Download size={16} /> Exportar Grupos
-                            </button>
-                        </div>
-
-                        {/* Saved Groups List */}
-                        <div>
-                            <h4 className="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wide">Grupos Guardados</h4>
-                            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                            {savedGroups.length === 0 ? (
-                                <p className="text-gray-400 text-sm italic">No hay grupos guardados aún.</p>
-                            ) : (
-                                savedGroups.map(group => (
-                                <div key={group.id} className="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-lg hover:shadow-sm transition-shadow">
-                                    <div className="overflow-hidden">
-                                    <p className="font-bold text-gray-800 truncate">{group.name}</p>
-                                    <p className="text-xs text-gray-500 truncate">{group.people.join(", ")}</p>
                                     </div>
-                                    <div className="flex gap-2 ml-2">
-                                    <button 
-                                        onClick={() => handleLoadGroup(group.people)}
-                                        className="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded transition-colors text-xs font-bold border border-emerald-200"
-                                    >
-                                        Cargar
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDeleteGroup(group.id)}
-                                        className="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                    </div>
+
                                 </div>
-                                ))
-                            )}
                             </div>
                         </div>
-
-                        </div>
-                    </div>
-                    </div>
-                )}
+                    )}
 
                 </div>
             );
@@ -2047,4 +2084,5 @@
         root.render(<App />);
     </script>
 </body>
+
 </html>
