@@ -42,16 +42,14 @@
     <!-- Babel para procesar JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Html2Canvas for Image Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <!-- Import Map para manejar dependencias de React y Lucide -->
     <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@18.2.0",
         "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+        "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+        "html-to-image": "https://esm.sh/html-to-image@1.11.11"
       }
     }
     </script>
@@ -182,6 +180,7 @@
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
+        import { toPng } from 'html-to-image';
         import {
             Plus, Minus, Trash2, DollarSign, FileText, X, ChevronRight,
             ChevronDown, ChevronUp, Calculator, HelpCircle, AlertCircle,
@@ -938,15 +937,29 @@
                     const clone = originalElement.cloneNode(true);
 
                     // Set up clone styles for optimal "Receipt" look
-                    clone.style.position = 'absolute';
-                    clone.style.top = '-9999px'; // Move off-screen
-                    clone.style.left = '0';
-                    clone.style.width = '450px'; // Fixed width for better readability
+                    // Create a hidden wrapper
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'fixed';
+                    wrapper.style.top = '0';
+                    wrapper.style.left = '0';
+                    wrapper.style.width = '0';
+                    wrapper.style.height = '0';
+                    wrapper.style.overflow = 'hidden';
+                    wrapper.style.zIndex = '-9999';
+                    document.body.appendChild(wrapper);
+
+                    wrapper.appendChild(clone);
+
+                    // Set up clone styles for optimal "Receipt" look
+                    clone.style.position = 'relative';
+                    clone.style.transform = 'none';
+                    clone.style.margin = '0';
+                    clone.style.width = '450px';
                     clone.style.height = 'auto';
-                    clone.style.zIndex = '-9999';
-                    clone.style.backgroundColor = '#1e293b';
+                    clone.style.backgroundColor = '#1e293b'; // Slate-800
                     clone.style.padding = '20px';
                     clone.style.borderRadius = '12px';
+                    clone.style.boxSizing = 'border-box';
 
                     // Remove sticky/positioning classes from clone
                     clone.classList.remove('sticky', 'top-24', 'h-fit');
@@ -965,30 +978,45 @@
                         el.style.maxWidth = 'none';
                     });
 
-                    document.body.appendChild(clone);
-
-                    const canvas = await window.html2canvas(clone, {
-                        backgroundColor: '#1e293b',
-                        scale: 2, // High resolution
-                        useCORS: true,
-                        logging: false
+                    // FIX: Remove Buttons (Share/WhatsApp) from export
+                    const buttons = clone.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        // Remove the button's container if it looks like the action bar
+                        if (btn.textContent.includes('Compartir') || btn.textContent.includes('WhatsApp')) {
+                            if (btn.parentElement && btn.parentElement.classList.contains('flex')) {
+                                btn.parentElement.style.display = 'none';
+                            } else {
+                                btn.style.display = 'none';
+                            }
+                        }
                     });
 
-                    document.body.removeChild(clone);
+                    // Allow icons/layout to settle
+                    await new Promise(resolve => setTimeout(resolve, 300));
 
-                    // --- DOWNLOAD ONLY LOGIC ---
-                    // Generates and downloads the image immediately
+                    const dataUrl = await toPng(clone, {
+                        backgroundColor: '#1e293b',
+                        width: 450,
+                        pixelRatio: 2, // High resolution
+                        style: {
+                            fontFamily: 'ui-sans-serif, system-ui, sans-serif'
+                        }
+                    });
+
+                    document.body.removeChild(wrapper);
+
+                    // --- DOWNLOAD ---
                     const fileName = `Resumen_${activeBill.name || 'Cuenta'}.png`;
                     const link = document.createElement('a');
                     link.download = fileName;
-                    link.href = canvas.toDataURL('image/png');
+                    link.href = dataUrl;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
 
                 } catch (err) {
                     console.error("Error exporting image:", err);
-                    alert("Error al generar la imagen.");
+                    alert("Error al generar la imagen. Intenta de nuevo.");
                 }
             };
 
