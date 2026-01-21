@@ -1,7 +1,7 @@
 # 🍻 TomeTranquilo - Cuentas Claras
 
 > **La forma más simple, rápida y privada de dividir cuentas entre amigos.**  
-> _Olvídate de las calculadoras y los malentendidos. Cuentas claras, amistades largas._
+> _Olvídate de las calculadoras y los malentendidos. Cuentas claras, conservan la amistad._
 
 🔗 **Prúebala ahora aquí:** [https://mendezrein.github.io/TomeTranquilo/](https://mendezrein.github.io/TomeTranquilo/)
 
