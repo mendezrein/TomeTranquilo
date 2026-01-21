@@ -77,6 +77,52 @@
             background: rgba(16, 185, 129, 0.8);
         }
 
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #f8fafc;
+            /* bg-gray-50 */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-bar-container {
+            width: 200px;
+            height: 6px;
+            background-color: #e2e8f0;
+            /* slate-200 */
+            border-radius: 9999px;
+            margin-top: 20px;
+            position: relative;
+            overflow: visible;
+            /* Allow emoji to stick out */
+        }
+
+        .loading-bar {
+            height: 100%;
+            background-color: #059669;
+            /* emerald-600 */
+            border-radius: 9999px;
+            width: 0%;
+            transition: width 0.2s linear;
+        }
+
+        .money-emoji {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            line-height: 1;
+            margin-left: -12px;
+            /* Center emoji on the end of bar */
+            transition: left 0.2s linear;
+        }
+
         /* Animaciones suaves */
         @keyframes fadeIn {
             from {
@@ -95,6 +141,42 @@
 </head>
 
 <body class="bg-gray-50 text-slate-800 font-sans">
+    <div id="loading-screen">
+        <div class="flex flex-col items-center">
+            <!-- Embedded SVG Favicon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-16 h-16 mb-4 shadow-sm rounded-xl">
+                <rect x="4" y="4" width="56" height="56" rx="10" fill="#217346" />
+                <path d="M20 20 L28 32 L20 44 L28 44 L32 36 L36 44 L44 44 L36 32 L44 20 L36 20 L32 28 L28 20 Z"
+                    fill="white" stroke="white" stroke-width="2" />
+            </svg>
+            <h1 class="text-xl font-bold text-slate-700 tracking-tight">Tome tranquilo Pariente</h1>
+            <p class="text-xs text-slate-400 mt-1">@mendezrein</p>
+
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="load-bar"></div>
+                <div class="money-emoji" id="money-emoji" style="left: 0%">💸</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fake loading progress
+        document.addEventListener('DOMContentLoaded', () => {
+            const bar = document.getElementById('load-bar');
+            const emoji = document.getElementById('money-emoji');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 10;
+                    if (width > 90) width = 90;
+                    bar.style.width = width + '%';
+                    emoji.style.left = width + '%';
+                }
+            }, 100);
+        });
+    </script>
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
@@ -202,6 +284,25 @@
         };
 
         function App() {
+            useEffect(() => {
+                // Remove loading screen when App mounts
+                const loader = document.getElementById('loading-screen');
+                if (loader) {
+                    // Finish the bar
+                    const bar = document.getElementById('load-bar');
+                    const emoji = document.getElementById('money-emoji');
+                    if (bar) bar.style.width = '100%';
+                    if (emoji) emoji.style.left = '100%';
+
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.remove();
+                        }, 500);
+                    }, 500); // Small delay to show 100%
+                }
+            }, []);
+
             // --- State ---
             const [bills, setBills] = useState(() => {
                 try {
