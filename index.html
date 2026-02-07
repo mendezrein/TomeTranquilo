@@ -10,8 +10,8 @@
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='10' fill='%23217346'/%3E%3Cpath d='M20 20 L28 32 L20 44 L28 44 L32 36 L36 44 L44 44 L36 32 L44 20 L36 20 L32 28 L28 20 Z' fill='white' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
 
     <!--
-                                                  /$$                      
-                                                 | $$                      
+                                             /$$                      
+                                            | $$                      
       /$$$$$$/$$$$   /$$$$$$   /$$$$$$$   /$$$$$$$  /$$$$$$  /$$$$$$$$
      | $$_  $$_  $$ /$$__  $$| $$__  $$ /$$__  $$ /$$__  $$|____ /$$/
      | $$ \ $$ \ $$| $$$$$$$$| $$  \ $$| $$  | $$| $$$$$$$$    /$$$$/  
@@ -186,7 +186,7 @@
             ChevronDown, ChevronUp, Calculator, HelpCircle, AlertCircle,
             Info, MessageSquare, Clipboard, Loader2, Undo, Redo, Copy,
             Download, Upload, Save, ArrowRight, Users, Calendar,
-            CheckCircle2, Share2, Image as ImageIcon
+            CheckCircle2, Share2, Image as ImageIcon, AlertTriangle
         } from 'lucide-react';
 
         // --- Utility Functions ---
@@ -365,6 +365,10 @@
             // Welcome Screen State - Always true on load
             const [showWelcome, setShowWelcome] = useState(true);
             const [welcomeTitle, setWelcomeTitle] = useState("");
+
+            // Import Conflict States
+            const [pendingImport, setPendingImport] = useState(null);
+            const [showImportModal, setShowImportModal] = useState(false);
 
             // Quick Start State
             const [qsPeopleCount, setQsPeopleCount] = useState(2);
@@ -1067,6 +1071,67 @@
 
             // --- Handlers for Imports ---
 
+            const finalizeImport = (parsedData, mode) => {
+                // mode: 'new' (default), 'overwrite', 'copy'
+
+                if (!showWelcome) saveHistory();
+
+                let finalName = parsedData.name || "Sin nombre";
+                let finalId = generateId();
+
+                if (mode === 'overwrite') {
+                    // Find existing bill to overwrite
+                    const existingBill = bills.find(b => b.name === finalName);
+                    if (existingBill) {
+                        finalId = existingBill.id; // Keep same ID so activeBillId doesn't break if selected
+                    }
+                } else if (mode === 'copy') {
+                    // Smart Naming Logic for Copy
+                    let baseName = finalName;
+                    let counter = 1;
+                    while (bills.some(b => b.name === finalName)) {
+                        finalName = `${baseName} (${counter})`;
+                        counter++;
+                    }
+                }
+
+                const newBill = {
+                    ...parsedData,
+                    id: finalId,
+                    name: finalName,
+                    items: parsedData.items.map(item => ({
+                        ...item,
+                        id: generateId()
+                    }))
+                };
+
+                if (showWelcome) {
+                    // Initial load behavior
+                    const isDefault = bills.length === 1 && bills[0].id === 'default';
+                    if (isDefault) {
+                        setBills([newBill]);
+                    } else if (mode === 'overwrite') {
+                        setBills(prev => prev.map(b => b.id === finalId ? newBill : b));
+                    } else {
+                        setBills(prev => [...prev, newBill]);
+                    }
+                    setActiveBillId(newBill.id);
+                    setShowWelcome(false);
+                } else {
+                    // Main app behavior
+                    if (mode === 'overwrite') {
+                        setBills(prev => prev.map(b => b.id === finalId ? newBill : b));
+                    } else {
+                        setBills(prev => [...prev, newBill]);
+                    }
+                    setActiveBillId(newBill.id);
+                }
+
+                // Cleanup
+                setPendingImport(null);
+                setShowImportModal(false);
+            };
+
             const handleImportBill = (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -1088,35 +1153,17 @@
 
                         // Validate it is a Bill
                         if (parsedData.items && Array.isArray(parsedData.items) && parsedData.people) {
-                            if (!showWelcome) saveHistory();
+                            
+                            const nameToCheck = parsedData.name || "Sin nombre";
+                            const exists = bills.some(b => b.name === nameToCheck);
 
-                            const newBill = {
-                                ...parsedData,
-                                id: generateId(),
-                                name: parsedData.name + (showWelcome ? "" : " (Importada)"),
-                                items: parsedData.items.map(item => ({
-                                    ...item,
-                                    id: generateId()
-                                }))
-                            };
-
-                            if (showWelcome) {
-                                // Check if current state is just the default empty bill
-                                const isDefault = bills.length === 1 && bills[0].id === 'default';
-
-                                if (isDefault) {
-                                    setBills([newBill]);
-                                } else {
-                                    // Append if we have existing saved data
-                                    setBills(prev => [...prev, newBill]);
-                                }
-                                setActiveBillId(newBill.id);
-                                setShowWelcome(false);
+                            if (exists) {
+                                setPendingImport(parsedData);
+                                setShowImportModal(true);
                             } else {
-                                setBills(prev => [...prev, newBill]);
-                                setActiveBillId(newBill.id);
+                                finalizeImport(parsedData, 'new');
                             }
-                            // Success alert removed as requested
+
                         } else {
                             alert("Este archivo no parece ser una Cuenta válida (.txt).\nSi intentas cargar Grupos, usa la opción en el menú de Grupos.");
                         }
@@ -1584,6 +1631,49 @@
 
                                     <button
                                         onClick={() => setShowDeleteConfirm(false)}
+                                        className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 text-sm"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- IMPORT CONFLICT MODAL --- */}
+                    {showImportModal && pendingImport && (
+                        <div
+                            className="fixed inset-0 bg-orange-900/30 backdrop-blur-sm z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-orange-100">
+                                <div className="bg-orange-50 p-6 text-center">
+                                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <AlertTriangle className="text-orange-600" size={24} />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-orange-900 mb-2">Nombre Duplicado</h3>
+                                    <p className="text-sm text-orange-700">
+                                        Ya existe una cuenta llamada <strong>"{pendingImport.name}"</strong>.
+                                    </p>
+                                    <p className="text-sm text-orange-700 mt-1">¿Qué deseas hacer?</p>
+                                </div>
+                                <div className="p-4 space-y-3">
+                                    <button
+                                        onClick={() => finalizeImport(pendingImport, 'overwrite')}
+                                        className="w-full bg-orange-600 text-white hover:bg-orange-700 font-bold py-3 rounded-xl transition-all shadow-sm"
+                                    >
+                                        Sobreescribir (Reemplazar)
+                                    </button>
+
+                                    <button
+                                        onClick={() => finalizeImport(pendingImport, 'copy')}
+                                        className="w-full bg-white border border-orange-200 text-orange-700 hover:bg-orange-50 font-bold py-3 rounded-xl transition-all"
+                                    >
+                                        Crear Copia (Agregar #)
+                                    </button>
+
+                                    <button
+                                        onClick={() => { setShowImportModal(false); setPendingImport(null); }}
                                         className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 text-sm"
                                     >
                                         Cancelar
