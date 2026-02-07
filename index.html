@@ -455,233 +455,6 @@
                         // Mode 1: Unit Price (Price is per unit/person)
                         costPerUnit = price;
                         lineTotal = price * totalShares;
-                    } elseic." },
-            { icon: <Save size={24} />, title: "Sin Registro", desc: "Todo se guarda localmente en tu navegador o en archivos de texto. Tu privacidad está asegurada." },
-            { icon: <CheckCircle2 size={24} />, title: "Verificación Total", desc: "Ingresa el total real de la boleta y la app te avisará si falta o sobra dinero en el cálculo." },
-            { icon: <FileText size={24} />, title: "Respaldo Fácil", desc: "Guarda y carga cuentas individuales (.txt) o exporta tus grupos para usarlos en otro dispositivo." }
-        ];
-
-        // --- Components ---
-
-        const CurrencyInput = ({ value, onChange, className, placeholder = "$0" }) => {
-            const [isFocused, setIsFocused] = useState(false);
-
-            // Format only when not focused
-            const displayValue = isFocused
-                ? (value === 0 ? '' : value)
-                : (value === 0 ? '' : formatCurrency(value));
-
-            return (
-                <input
-                    type="text"
-                    inputMode="numeric"
-                    value={displayValue}
-                    placeholder={placeholder}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    onChange={(e) => {
-                        // Allow only numbers
-                        const rawVal = e.target.value.replace(/\D/g, '');
-                        onChange(rawVal === '' ? 0 : parseInt(rawVal, 10));
-                    }}
-                    className={className}
-                />
-            );
-        };
-
-        // --- Initial Data ---
-
-        const EMPTY_BILL = {
-            id: 'default',
-            name: '',
-            date: new Date().toISOString().split('T')[0],
-            people: ['Persona A', 'Persona B'],
-            items: [
-                {
-                    id: '1',
-                    name: 'Item Ejemplo',
-                    price: 10000,
-                    splitCount: 1,
-                    shares: { 'Persona A': 1, 'Persona B': 0 }
-                }
-            ],
-            tipPercent: 10,
-            verificationTotal: ''
-        };
-
-        function App() {
-            useEffect(() => {
-                // Remove loading screen when App mounts
-                const loader = document.getElementById('loading-screen');
-                if (loader) {
-                    // Finish the bar
-                    const bar = document.getElementById('load-bar');
-                    const emoji = document.getElementById('money-emoji');
-                    if (bar) bar.style.width = '100%';
-                    if (emoji) emoji.style.left = '100%';
-
-                    setTimeout(() => {
-                        loader.style.opacity = '0';
-                        setTimeout(() => {
-                            loader.remove();
-                        }, 500);
-                    }, 500); // Small delay to show 100%
-                }
-            }, []);
-
-            // --- State ---
-            const [bills, setBills] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('cuentas_claras_data');
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            return parsed.map(bill => ({
-                                ...bill,
-                                verificationTotal: bill.verificationTotal !== undefined ? bill.verificationTotal : '',
-                                items: bill.items.map(item => ({
-                                    ...item,
-                                    splitCount: item.splitCount || 1,
-                                    shares: Object.keys(item.shares).reduce((acc, key) => {
-                                        const val = item.shares[key];
-                                        if (typeof val === 'boolean') {
-                                            acc[key] = val ? 1 : 0;
-                                        } else {
-                                            acc[key] = parseFloat(val) || 0;
-                                        }
-                                        return acc;
-                                    }, {})
-                                }))
-                            }));
-                        }
-                    }
-                } catch (e) {
-                    console.error("Failed to load bills", e);
-                }
-                return [EMPTY_BILL];
-            });
-
-            const [activeBillId, setActiveBillId] = useState(() => {
-                const savedId = localStorage.getItem('cuentas_claras_active_id');
-                return savedId || bills[0]?.id || 'default';
-            });
-
-            // Saved Groups State
-            const [savedGroups, setSavedGroups] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('cuentas_claras_groups');
-                    return saved ? JSON.parse(saved) : [];
-                } catch (e) {
-                    return [];
-                }
-            });
-
-            // History State for Undo/Redo
-            const [history, setHistory] = useState([]);
-            const [future, setFuture] = useState([]);
-
-            // UI States
-            const [showHelp, setShowHelp] = useState(false);
-            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-            const [showGroupModal, setShowGroupModal] = useState(false);
-            const [newGroupName, setNewGroupName] = useState("");
-            const [aiDraftMessage, setAiDraftMessage] = useState("");
-            const [expandedPeople, setExpandedPeople] = useState({});
-            const [currentTip, setCurrentTip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
-
-            // Welcome Screen State - Always true on load
-            const [showWelcome, setShowWelcome] = useState(true);
-            const [welcomeTitle, setWelcomeTitle] = useState("");
-
-            // Quick Start State
-            const [qsPeopleCount, setQsPeopleCount] = useState(2);
-            const [qsGroupId, setQsGroupId] = useState("");
-            const [qsManualNames, setQsManualNames] = useState(""); // State for manual names
-            const [qsSelectedPresets, setQsSelectedPresets] = useState([]);
-            const [qsMode, setQsMode] = useState('manual'); // 'count', 'manual', or 'group'
-            const [qsItemsMode, setQsItemsMode] = useState('presets'); // 'presets' or 'manual'
-            const [qsManualItems, setQsManualItems] = useState(""); // State for manual items
-            const [qsTotal, setQsTotal] = useState(""); // New state for Total
-            const [qsTipPercent, setQsTipPercent] = useState(10); // Tip Percent State
-            const [qsErrors, setQsErrors] = useState({}); // New Error State
-
-            // Selection State
-            const [selectedItemId, setSelectedItemId] = useState(null);
-
-            // Delete Confirm Modal State
-            const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-            // Ref for file input
-            const fileInputRef = useRef(null);
-            const welcomeFileInputRef = useRef(null);
-            const groupFileInputRef = useRef(null);
-
-            // Ref for Summary Panel Image Export
-            const summaryRef = useRef(null);
-
-            // Derived state for current active bill
-            const activeBill = useMemo(() =>
-                bills.find(b => b.id === activeBillId) || bills[0],
-                [bills, activeBillId]);
-
-            // Check if we have saved data (not just the default empty bill)
-            const hasSavedData = useMemo(() =>
-                bills.length > 0 && (bills.length > 1 || bills[0].id !== 'default'),
-                [bills]);
-
-            // --- Effects ---
-
-            useEffect(() => {
-                localStorage.setItem('cuentas_claras_data', JSON.stringify(bills));
-                localStorage.setItem('cuentas_claras_active_id', activeBillId);
-            }, [bills, activeBillId]);
-
-            useEffect(() => {
-                localStorage.setItem('cuentas_claras_groups', JSON.stringify(savedGroups));
-            }, [savedGroups]);
-
-            // --- Logic / Calculations ---
-
-            const calculatedResults = useMemo(() => {
-                if (!activeBill) return {
-                    byPerson: {}, billSubtotal: 0, billTotal: 0, totalTip: 0, unallocatedTotal: 0, difference: 0, isMismatch: false
-                };
-
-                const totals = {};
-                const subtotalByPerson = {};
-                const detailsByPerson = {};
-
-                activeBill.people.forEach(p => {
-                    totals[p] = 0;
-                    subtotalByPerson[p] = 0;
-                    detailsByPerson[p] = [];
-                });
-
-                let billSubtotal = 0;
-                let unallocatedTotal = 0;
-
-                activeBill.items.forEach(item => {
-                    const price = parseFloat(item.price) || 0;
-
-                    let totalShares = 0;
-                    activeBill.people.forEach(p => {
-                        let qty = parseFloat(item.shares[p]) || 0;
-                        let splitCount = parseInt(item.splitCount);
-                        if (isNaN(splitCount) || splitCount < 1) splitCount = 1;
-                        if (splitCount > 1 && qty > 0) qty = 1;
-                        totalShares += qty;
-                    });
-
-                    let targetSplit = parseInt(item.splitCount);
-                    if (isNaN(targetSplit) || targetSplit < 1) targetSplit = 1;
-
-                    let lineTotal = 0;
-                    let costPerUnit = 0;
-
-                    if (targetSplit === 1) {
-                        // Mode 1: Unit Price (Price is per unit/person)
-                        costPerUnit = price;
-                        lineTotal = price * totalShares;
                     } else {
                         // Mode 2: Fixed Split (Price is Total, Split by Fixed N)
                         costPerUnit = price / targetSplit;
@@ -963,7 +736,11 @@
                 };
 
                 if (isDefaultBill) {
-                    updateBill(newBillData, false);
+                    // If overwriting the default bill, we MUST generate a new ID
+                    // so it registers as "Saved Data" (non-default) next time.
+                    const newId = generateId();
+                    setBills(prev => prev.map(b => b.id === 'default' ? { ...b, ...newBillData, id: newId } : b));
+                    setActiveBillId(newId);
                 } else {
                     const newBill = { ...newBillData, id: generateId() };
                     setBills(prev => [...prev, newBill]);
@@ -1324,7 +1101,15 @@
                             };
 
                             if (showWelcome) {
-                                setBills([newBill]);
+                                // Check if current state is just the default empty bill
+                                const isDefault = bills.length === 1 && bills[0].id === 'default';
+
+                                if (isDefault) {
+                                    setBills([newBill]);
+                                } else {
+                                    // Append if we have existing saved data
+                                    setBills(prev => [...prev, newBill]);
+                                }
                                 setActiveBillId(newBill.id);
                                 setShowWelcome(false);
                             } else {
